@@ -18,7 +18,7 @@ namespace UnityStandardAssets._2D
         const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         private Animator m_Anim;            // Reference to the player's animator component.
         public Rigidbody2D m_Rigidbody2D;
-        private bool m_FacingRight = true;  // For determining which way the player is currently facing.
+        public bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
         public int m_jumpLimit = 2;
         public int m_numberOfJumps = 0;
@@ -150,7 +150,6 @@ namespace UnityStandardAssets._2D
 
         public void StopMovement()
         {
-            Debug.Log("STOP");
             m_Rigidbody2D.velocity = new Vector2(0.0f, 0.0f);
             m_Anim.SetFloat("Speed", 0);          
         }

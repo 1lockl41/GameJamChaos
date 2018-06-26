@@ -56,23 +56,22 @@ namespace UnityStandardAssets._2D
 
         public GameObject shieldSprite;
 
-        bool canAttack = true;
+        bool canLightAttack = true;
         bool isLightAttacking = false;
-        float attackDurationLight = 0.1f;
+        float attackDurationLight = 0.2f;
         float attackTimerLight = 0.0f;
         public GameObject attackBoxLight;
 
+        bool canHeavyAttack = true;
         bool isHeavyAttacking = false;
-        float attackDurationHeavy = 0.2f;
+        float attackDurationHeavy = 0.3f;
         float attackTimerHeavy = 0.0f;
         public GameObject attackBoxHeavy;
 
-        float attackResetDuration = 0.1f;
-        float attackResetTimer = 0.0f;
-
-
-
-        public bool dontAllowMovement = false;
+        float lightAttackResetDuration = 0.35f;
+        float lightAttackResetTimer = 0.0f;
+        float heavyAttackResetDuration = 1.0f;
+        float heavyAttackResetTimer = 0.0f;
 
         public string horizontalAxisButton;
         public string verticalAxisButton;
@@ -81,22 +80,19 @@ namespace UnityStandardAssets._2D
         public string fire2Button;
         public string fire3Button;
 
+        BoxCollider2D playerCollider;
+
         private void Awake()
         {
             UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
 
             m_Character = GetComponent<PlatformerCharacter2D>();
             m_jumpPower = m_jumpPowerMin;
+            playerCollider = GetComponent<BoxCollider2D>();
         }
 
         private void Update()
         {
-            if(dontAllowMovement)
-            {
-                m_canMove = false;
-                canAttack = false;
-            }
-
             if (m_wasPunchedUp)
             {
                 m_punchUpTimer += Time.deltaTime;
@@ -259,6 +255,7 @@ namespace UnityStandardAssets._2D
 
             if (m_isDodging)
             {
+                playerCollider.enabled = false;
                 m_Character.StopGravityScale();
                 m_dodgeStopTimer += Time.deltaTime;
                 if (m_dodgeStopTimer > m_dodgeStopDuration)
@@ -269,6 +266,7 @@ namespace UnityStandardAssets._2D
 
                     m_canDodge = false;
                     m_betweenDodgeTimer = 0.0f;
+                    playerCollider.enabled = true;
                 }
 
                 shieldSprite.SetActive(false);
@@ -305,30 +303,52 @@ namespace UnityStandardAssets._2D
                 }               
             }
 
-            if(!canAttack)
+            if(!canLightAttack)
             {
-                attackResetTimer += Time.deltaTime;
-                if(attackResetTimer > attackResetDuration)
+                lightAttackResetTimer += Time.deltaTime;
+                if(lightAttackResetTimer > lightAttackResetDuration)
                 {
-                    canAttack = true;
-                    attackResetTimer = 0.0f;
+                    canLightAttack = true;
+                    lightAttackResetTimer = 0.0f;
                 }
             }
 
-            if(CrossPlatformInputManager.GetButtonDown(fireButton))
+
+            if (!canHeavyAttack)
             {
-                if(!isLightAttacking && !isHeavyAttacking && canAttack)
+                heavyAttackResetTimer += Time.deltaTime;
+                if (heavyAttackResetTimer > heavyAttackResetDuration)
+                {
+                    canHeavyAttack = true;
+                    heavyAttackResetTimer = 0.0f;
+                }
+            }
+
+            if (CrossPlatformInputManager.GetButtonDown(fireButton))
+            {
+                if(!isLightAttacking && !isHeavyAttacking && canLightAttack)
                 {
                     isLightAttacking = true;
-                    m_Character.StopMovementHorizontal();
+                    m_Character.StopMovementVertical();
+
+                    if(m_Character.m_FacingRight)
+                    {
+                        m_Character.m_Rigidbody2D.AddForce(Vector2.right * 10, ForceMode2D.Impulse);
+                    }
+                    else
+                    {
+                        m_Character.m_Rigidbody2D.AddForce(-Vector2.right * 10, ForceMode2D.Impulse);
+                    }
+                    
                 }
             }
             else if (CrossPlatformInputManager.GetButtonDown(fire3Button))
             {
-                if (!isLightAttacking && !isHeavyAttacking && canAttack)
+                if (!isLightAttacking && !isHeavyAttacking && canHeavyAttack)
                 {
                     isHeavyAttacking = true;
-                    m_Character.StopMovementHorizontal();
+                    m_Character.StopMovementVertical();
+                    m_Character.m_Rigidbody2D.AddForce(Vector2.up * 15, ForceMode2D.Impulse);
                 }
             }
 
@@ -342,7 +362,7 @@ namespace UnityStandardAssets._2D
                     isLightAttacking = false;
                     attackTimerLight = 0.0f;
                     attackBoxLight.SetActive(false);
-                    canAttack = false;
+                    canLightAttack = false;
                     m_canMove = true;
                 }
             }
@@ -356,7 +376,7 @@ namespace UnityStandardAssets._2D
                     isHeavyAttacking = false;
                     attackTimerHeavy = 0.0f;
                     attackBoxHeavy.SetActive(false);
-                    canAttack = false;
+                    canHeavyAttack = false;
                     m_canMove = true;
                 }
             }
@@ -389,20 +409,20 @@ namespace UnityStandardAssets._2D
                 m_canTakeDamage = false;
                 currentHealthPercent += damage;
 
-                if (UnityEngine.Random.Range(0.0f, 100.0f) < currentHealthPercent)
+                if (UnityEngine.Random.Range(0.0f, 200.0f) < currentHealthPercent)
                 {
-                    //Debug.Log("big hit");
+                    Debug.Log("big hit");
                     m_wasHitBig = true;
 
                     if(shouldPunchUp)
                     {
                         m_Character.StopMovement();
-                        m_Character.AddPunchUpForce(attackPos, 0.8f * damage);
+                        m_Character.AddPunchUpForce(attackPos, (1.2f * damage) * currentHealthPercent / 100);
                         m_wasPunchedUp = true;
                     }
                     else
                     {
-                        m_Character.PushAwayFromPoint(attackPos, 1.0f * damage);
+                        m_Character.PushAwayFromPoint(attackPos, (1.4f * damage) * currentHealthPercent / 100);
                     }
                 }
                 else
@@ -413,11 +433,11 @@ namespace UnityStandardAssets._2D
                     if (shouldPunchUp)
                     {
                         m_Character.StopMovement();
-                        m_Character.AddPunchUpForce(attackPos, 0.8f * damage);
+                        m_Character.AddPunchUpForce(attackPos, (1.0f * damage) * currentHealthPercent / 100);
                     }
                     else
                     {
-                        m_Character.PushAwayFromPoint(attackPos, 1.0f * damage);
+                        m_Character.PushAwayFromPoint(attackPos, (1.2f * damage) * currentHealthPercent / 200);
                     }
                 }
             }
