@@ -22,7 +22,7 @@ namespace UnityStandardAssets._2D
 
         public int m_jumpLimit = 2;
         public int m_numberOfJumps = 0;
-        public float m_timeBetweenJump = 0.1f;
+        public float m_timeBetweenJump = 0.25f;
         public float m_timeSinceLastJump = 0.0f;
 
         public float m_dodgeForce = 30.0f;
@@ -205,12 +205,13 @@ namespace UnityStandardAssets._2D
 
         public void AddDownForce()
         {
-            m_Rigidbody2D.AddForce(new Vector2(0.0f, -15.0f));
+            m_Rigidbody2D.AddForce(new Vector2(0.0f, -12.0f));
         }
 
         public void AddUpForce()
         {
-            m_Rigidbody2D.AddForce(new Vector2(0.0f, 15.0f));
+
+            m_Rigidbody2D.AddForce(new Vector2(0.0f, 12.0f));
         }
 
         public bool CheckIfFalling()
@@ -237,7 +238,9 @@ namespace UnityStandardAssets._2D
 
         public void ResetRotation()
         {
-            this.gameObject.transform.eulerAngles = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            transform.position = new Vector2(this.transform.position.x, this.transform.position.y + 1.0f);
+            //this.gameObject.transform.eulerAngles = Vector3.zero;
             m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
 

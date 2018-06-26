@@ -8,33 +8,40 @@ namespace UnityStandardAssets._2D
     public class Platformer2DUserControl : MonoBehaviour
     {
         private PlatformerCharacter2D m_Character;
+
+        //Jumping variables
         private bool m_Jump;
-
         bool m_JumpHeld;
-
         float m_jumpPower;
-        public float m_jumpPowerMin = 10.0f;
-        public float m_jumpPowerMax = 20.0f;
-        public float m_JumpPowerGain = 70.0f;
+        public float m_jumpPowerMin = 8.0f;
+        public float m_jumpPowerMax = 18.0f;
+        public float m_JumpPowerGain = 100.0f;
         public bool m_isChargingJump = false;
 
+        //Dodging variables
         public bool m_isDodging = false;
         float m_dodgeStopTimer = 0.0f;
-        float m_dodgeStopDuration = 0.1f;
-
-        float m_timeBetweenDodge = 0.15f;
+        float m_dodgeStopDuration = 0.15f;
+        float m_timeBetweenDodge = 0.2f;
         float m_betweenDodgeTimer = 0.0f;
         bool m_canDodge = true;
 
+        //Shielding variables
         public bool m_isShielding = false;
-        float m_timeBetweenShield = 0.3f;
+        float m_timeBetweenShield = 0.8f;
         float m_betweenShieldTimer = 0.0f;
         bool m_canShield = true;
+        public float m_shieldChargeCurrent = 0.0f;
+        float m_shieldChargeMax = 100.0f;
+        float m_shieldRechargeRate = 45.0f;
+        float m_shieldDrainRate = 125.0f;
+        float m_shieldMinChargeForUse = 25.0f;
+        public GameObject shieldSprite;
 
         bool m_isAxisInUse = false;
 
         bool m_canTakeDamage = true;
-        float m_damageDelay = 0.2f;
+        float m_damageDelay = 0.25f;
         float m_damageDelayTimer = 0.0f;
 
         bool m_wasHitSmall = false;
@@ -42,19 +49,18 @@ namespace UnityStandardAssets._2D
         float m_hitSmallTimer = 0.0f;
 
         bool m_wasHitBig = false;
-        float m_hitBigDelay = 0.5f;
+        float m_hitBigDelay = 1.0f;
         float m_hitBigTimer = 0.0f;
+        float m_minBigHitTime = 0.2f;
 
         bool m_wasPunchedUp = false;
-        float m_minPunchUpTime = 0.5f;
-        float m_maxPunchUpTime = 2.0f;
+        float m_minPunchUpTime = 0.25f;
+        float m_maxPunchUpTime = 1.5f;
         float m_punchUpTimer = 0.0f;
 
         public bool m_canMove = true;
 
         public float currentHealthPercent = 0.0f;
-
-        public GameObject shieldSprite;
 
         bool canLightAttack = true;
         bool isLightAttacking = false;
@@ -89,6 +95,12 @@ namespace UnityStandardAssets._2D
             m_Character = GetComponent<PlatformerCharacter2D>();
             m_jumpPower = m_jumpPowerMin;
             playerCollider = GetComponent<BoxCollider2D>();
+            m_shieldChargeCurrent = m_shieldChargeMax;
+        }
+
+        private void OnEnable()
+        {
+            m_shieldChargeCurrent = m_shieldChargeMax;
         }
 
         private void Update()
@@ -101,10 +113,10 @@ namespace UnityStandardAssets._2D
 
                 m_Character.m_Rigidbody2D.AddTorque(CrossPlatformInputManager.GetAxis(horizontalAxisButton) * 1);
 
-                if(m_punchUpTimer > m_minPunchUpTime)
+                if(m_punchUpTimer > (m_minPunchUpTime + ((m_minPunchUpTime * currentHealthPercent) / 100)))
                 {
                     m_canShield = true;
-                    if (m_Character.m_Grounded || m_isShielding || (m_punchUpTimer > m_maxPunchUpTime))
+                    if (m_isShielding || (m_punchUpTimer > (m_maxPunchUpTime + ((m_maxPunchUpTime * currentHealthPercent) / 100))))
                     {
                         m_punchUpTimer = 0.0f;
                         m_wasPunchedUp = false;
@@ -137,15 +149,29 @@ namespace UnityStandardAssets._2D
 
                 if (m_wasHitBig)
                 {
-                    m_canShield = false;
+                    m_Character.UnfreezeRotation();
+
+                    m_Character.m_Rigidbody2D.AddTorque(CrossPlatformInputManager.GetAxis(horizontalAxisButton) * 1);
+
                     m_canMove = false;
                     m_hitBigTimer += Time.deltaTime;
-                    if (m_hitBigTimer > m_hitBigDelay)
+
+                    if (m_hitBigTimer > (m_minBigHitTime + ((m_minBigHitTime * currentHealthPercent) / 100))) 
                     {
-                        m_wasHitBig = false;
-                        m_hitBigTimer = 0.0f;
-                        m_canMove = true;
                         m_canShield = true;
+
+                        if (m_hitBigTimer > (m_hitBigDelay + ((m_hitBigDelay * currentHealthPercent) / 100)) || m_isShielding)
+                        {
+                            m_wasHitBig = false;
+                            m_hitBigTimer = 0.0f;
+                            m_canMove = true;
+                            m_canShield = true;
+                            m_Character.ResetRotation();
+                        }
+                    }
+                    else
+                    {
+                        m_canShield = false;
                     }
                 }
             }
@@ -162,15 +188,16 @@ namespace UnityStandardAssets._2D
 
             if (!m_Character.m_Grounded && !m_isShielding)
             {
-                if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) < 0)
+                if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) > 0)
                 {
                     m_Character.AddDownForce();
                 }
-                else if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) > 0 && m_Character.CheckIfFalling())
+                else if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) < 0 && m_Character.CheckIfFalling())
                 {
                     m_Character.AddUpForce();
                 }
             }
+
 
             if (CrossPlatformInputManager.GetButton(jumpButton) && m_Character.m_Grounded)
             {
@@ -201,10 +228,7 @@ namespace UnityStandardAssets._2D
             }
             else if(m_isShielding)
             {
-                m_Character.ResetGravityScale();
-                m_isShielding = false;
-                shieldSprite.SetActive(false);
-                m_canShield = false;
+                StopShielding();               
             }
 
             if(!m_canShield)
@@ -214,6 +238,24 @@ namespace UnityStandardAssets._2D
                 {
                     m_canShield = true;
                     m_betweenShieldTimer = 0.0f;
+                }
+            }
+
+            if(m_isShielding)
+            {
+                m_shieldChargeCurrent -= (m_shieldDrainRate * Time.deltaTime);
+                if(m_shieldChargeCurrent < 0)
+                {
+                    StopShielding();
+                    m_shieldChargeCurrent = 0;
+                }
+            }
+            else if(!m_isShielding && (m_shieldChargeCurrent < m_shieldChargeMax))
+            {
+                m_shieldChargeCurrent += (m_shieldRechargeRate * Time.deltaTime);
+                if(m_shieldChargeCurrent > m_shieldChargeMax)
+                {
+                    m_shieldChargeCurrent = m_shieldChargeMax;
                 }
             }
 
@@ -290,7 +332,10 @@ namespace UnityStandardAssets._2D
 
                     if (CrossPlatformInputManager.GetButtonUp(jumpButton))
                     {
-                        m_Jump = true;
+                        if (m_canMove)
+                        {
+                            m_Jump = true;
+                        }
                         m_isChargingJump = false;
                     }
                 }
@@ -298,7 +343,10 @@ namespace UnityStandardAssets._2D
                 {
                     if (CrossPlatformInputManager.GetButtonDown(jumpButton))
                     {
-                        m_Jump = true;
+                        if (m_canMove)
+                        {
+                            m_Jump = true;
+                        }
                     }
                 }               
             }
@@ -402,7 +450,7 @@ namespace UnityStandardAssets._2D
 
         public void TakeDamage(float damage, Vector2 attackPos, bool shouldPunchUp)
         {
-            if (m_canTakeDamage)
+            if (m_canTakeDamage && !m_isShielding && !m_isDodging)
             {
                 m_Character.m_Grounded = false;
 
@@ -411,18 +459,17 @@ namespace UnityStandardAssets._2D
 
                 if (UnityEngine.Random.Range(0.0f, 200.0f) < currentHealthPercent)
                 {
-                    Debug.Log("big hit");
                     m_wasHitBig = true;
 
                     if(shouldPunchUp)
                     {
                         m_Character.StopMovement();
-                        m_Character.AddPunchUpForce(attackPos, (1.2f * damage) * currentHealthPercent / 100);
+                        m_Character.AddPunchUpForce(attackPos, ((1.2f * damage) + ((damage * currentHealthPercent) / 100)));
                         m_wasPunchedUp = true;
                     }
                     else
                     {
-                        m_Character.PushAwayFromPoint(attackPos, (1.4f * damage) * currentHealthPercent / 100);
+                        m_Character.PushAwayFromPoint(attackPos, ((1.4f * damage) + ((damage * currentHealthPercent) / 100)));
                     }
                 }
                 else
@@ -433,14 +480,22 @@ namespace UnityStandardAssets._2D
                     if (shouldPunchUp)
                     {
                         m_Character.StopMovement();
-                        m_Character.AddPunchUpForce(attackPos, (1.0f * damage) * currentHealthPercent / 100);
+                        m_Character.AddPunchUpForce(attackPos, ((1.2f * damage) + ((damage * currentHealthPercent) / 100)));
                     }
                     else
                     {
-                        m_Character.PushAwayFromPoint(attackPos, (1.2f * damage) * currentHealthPercent / 200);
+                        m_Character.PushAwayFromPoint(attackPos, ((1.4f * damage) + ((damage * currentHealthPercent) / 100)));
                     }
                 }
             }
+        }
+
+        void StopShielding()
+        {
+            m_Character.ResetGravityScale();
+            m_isShielding = false;
+            shieldSprite.SetActive(false);
+            m_canShield = false;
         }
     }
 }
