@@ -86,6 +86,8 @@ namespace UnityStandardAssets._2D
         public string fireButton;
         public string fire2Button;
         public string fire3Button;
+        public string horizontalAxisDpad;
+        public string verticalAxisDpad;
 
         BoxCollider2D playerCollider;
 
@@ -119,7 +121,7 @@ namespace UnityStandardAssets._2D
             {
                 if (!hasStartedBuff)
                 {
-                    transform.localScale = new Vector2((startScaleX * 1.2f) + ((startScaleX * buffAmount * 1.5f) / 100), (startScaleY * 1.2f) + ((startScaleY * buffAmount * 1.5f) / 100));
+                    transform.localScale = new Vector3((startScaleX * 1.2f) + ((startScaleX * buffAmount) / 100), (startScaleY * 1.2f) + ((startScaleY * buffAmount) / 100), transform.localScale.z);
                     transform.position = new Vector2(this.transform.position.x, this.transform.position.y + 3.0f);
                     hasStartedBuff = true;
                 }

@@ -1,7 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: bf98d67378354bb4d8f65da934d28ec1
 folderAsset: yes
 timeCreated: 1530099042
+=======
+guid: ab323e4eef4326f4dbf6248a4f4573b6
+folderAsset: yes
+timeCreated: 1530017095
+>>>>>>> origin/Sam's-Branch
 licenseType: Free
 DefaultImporter:
   userData: 
