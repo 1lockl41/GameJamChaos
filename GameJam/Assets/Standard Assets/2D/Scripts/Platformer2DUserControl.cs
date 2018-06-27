@@ -41,7 +41,7 @@ namespace UnityStandardAssets._2D
         bool m_isAxisInUse = false;
 
         bool m_canTakeDamage = true;
-        float m_damageDelay = 0.25f;
+        float m_damageDelay = 0.2f;
         float m_damageDelayTimer = 0.0f;
 
         bool m_wasHitSmall = false;
@@ -75,11 +75,30 @@ namespace UnityStandardAssets._2D
         float attackDurationHeavy = 0.3f;
         float attackTimerHeavy = 0.0f;
         public GameObject attackBoxHeavy;
+        public GameObject attackBoxHeavyBuffed;
+
+        public bool specialIsProjectile = false;
+        public bool firesOneProjectile = true;
+        float projectileSpawnDuration = 0.3f;
+        float projectSpawnTimer = 0.0f;
+        bool hasFiredProjectile = false;
+        bool canSpecialAttack = true;
+        bool isSpecialAttacking = false;
+        public float attackDurationSpecial = 0.5f;
+        float attackTimerSpecial = 0.0f;
+        public GameObject attackBoxSpecial;
+        public float specialChargeDuration = 0.4f;
+        public bool specialsNeedsToHitGround = false;
+        public bool canOnlyUseSpecialInAir = false;
+        float specialTimeOnGroundDuration = 0.6f;
+        float specialTimeOnGroundTimer = 0.0f;
 
         float lightAttackResetDuration = 0.35f;
         float lightAttackResetTimer = 0.0f;
-        float heavyAttackResetDuration = 1.0f;
+        float heavyAttackResetDuration = 0.8f;
         float heavyAttackResetTimer = 0.0f;
+        float specialAttackResetDuration = 1.5f;
+        float specialAttackResetTimer = 0.0f;
 
         public string horizontalAxisButton;
         public string verticalAxisButton;
@@ -87,8 +106,6 @@ namespace UnityStandardAssets._2D
         public string fireButton;
         public string fire2Button;
         public string fire3Button;
-        public string horizontalAxisDpad;
-        public string verticalAxisDpad;
 
         public bool isBuffed;
         public float buffAmount;
@@ -200,7 +217,8 @@ namespace UnityStandardAssets._2D
             //Control for light attack, starts the attack
             LightAttackControl();
             //Control for heavy attack, starts the attack.
-            HeavyAttackControl();
+            //HeavyAttackControl();
+            SpecialAttackControl();
 
             //If is light attacking, perform light attack action.
             if (isLightAttacking)
@@ -211,6 +229,10 @@ namespace UnityStandardAssets._2D
             else if(isHeavyAttacking)
             {
                 IsHeavyAttacking();
+            }
+            else if(isSpecialAttacking)
+            {
+                IsSpecialAttacking();
             }
         }
 
@@ -240,34 +262,34 @@ namespace UnityStandardAssets._2D
                 m_canTakeDamage = false;
                 currentHealthPercent += damage;
 
-                if (UnityEngine.Random.Range(0.0f, 200.0f) < currentHealthPercent)
+                //Using chance based on remaining health, determine whether or not this attack was big, knocking them down
+                if (UnityEngine.Random.Range(0.0f, (200.0f * (speedScale * 2))) < currentHealthPercent)
                 {
                     m_wasHitBig = true;
 
                     if(shouldPunchUp)
                     {
                         m_Character.StopMovement();
-                        m_Character.AddPunchUpForce(attackPos, ((1.2f * damage) + ((damage * currentHealthPercent) / 100)));
+                        m_Character.AddPunchUpForce(attackPos, (((1.5f * damage) + ((damage * currentHealthPercent) / 100)) / speedScale));
                         m_wasPunchedUp = true;
                     }
                     else
                     {
-                        m_Character.PushAwayFromPoint(attackPos, ((1.4f * damage) + ((damage * currentHealthPercent) / 100)));
+                        m_Character.PushAwayFromPoint(attackPos, (((1.5f * damage) + ((damage * currentHealthPercent) / 100)) / speedScale));
                     }
                 }
                 else
                 {
-                    //Debug.Log("small hit");
                     m_wasHitSmall = true;
 
                     if (shouldPunchUp)
                     {
                         m_Character.StopMovement();
-                        m_Character.AddPunchUpForce(attackPos, ((1.2f * damage) + ((damage * currentHealthPercent) / 100)));
+                        m_Character.AddPunchUpForce(attackPos, (((1.5f * damage) + ((damage * currentHealthPercent) / 100)) / speedScale));
                     }
                     else
                     {
-                        m_Character.PushAwayFromPoint(attackPos, ((1.4f * damage) + ((damage * currentHealthPercent) / 100)));
+                        m_Character.PushAwayFromPoint(attackPos, (((1.5f * damage) + ((damage * currentHealthPercent) / 100)) / speedScale));
                     }
                 }
             }
@@ -551,7 +573,7 @@ namespace UnityStandardAssets._2D
 
             if (CrossPlatformInputManager.GetButtonDown(fireButton) && canAttack)
             {
-                if (!isLightAttacking && !isHeavyAttacking && canLightAttack)
+                if (!isLightAttacking && !isHeavyAttacking && !isSpecialAttacking && canLightAttack)
                 {
                     isLightAttacking = true;
                     m_Character.StopMovementVertical();
@@ -574,7 +596,7 @@ namespace UnityStandardAssets._2D
             if (!canHeavyAttack)
             {
                 heavyAttackResetTimer += Time.deltaTime;
-                if (heavyAttackResetTimer > heavyAttackResetDuration)
+                if (heavyAttackResetTimer > (heavyAttackResetDuration * speedScale))
                 {
                     canHeavyAttack = true;
                     heavyAttackResetTimer = 0.0f;
@@ -583,11 +605,36 @@ namespace UnityStandardAssets._2D
 
             if (CrossPlatformInputManager.GetButtonDown(fire3Button) && canAttack)
             {
-                if (!isLightAttacking && !isHeavyAttacking && canHeavyAttack)
+                if (!isLightAttacking && !isHeavyAttacking && !isSpecialAttacking && canHeavyAttack)
                 {
                     isHeavyAttacking = true;
                     m_Character.StopMovementVertical();
                     m_Character.m_Rigidbody2D.AddForce(Vector2.up * 15, ForceMode2D.Impulse);
+                }
+            }
+        }
+
+        void SpecialAttackControl()
+        {
+            if (!canSpecialAttack)
+            {               
+                specialAttackResetTimer += Time.deltaTime;
+                if (specialAttackResetTimer > (specialAttackResetDuration * speedScale))
+                {
+                    canSpecialAttack = true;
+                    specialAttackResetTimer = 0.0f;
+                }
+            }
+
+            if (CrossPlatformInputManager.GetButtonDown(fire3Button) && canAttack)
+            {
+                if (canOnlyUseSpecialInAir && !m_Character.m_Grounded || !canOnlyUseSpecialInAir)
+                {
+                    if (!isLightAttacking && !isHeavyAttacking && !isSpecialAttacking && canSpecialAttack)
+                    {
+                        isSpecialAttacking = true;
+                        m_Character.StopMovement();
+                    }
                 }
             }
         }
@@ -620,16 +667,86 @@ namespace UnityStandardAssets._2D
 
         void IsHeavyAttacking()
         {
+            if (isBuffed)
+            {
+                attackBoxHeavyBuffed.SetActive(true);
+                attackBoxHeavy.SetActive(false);
+            }
+            else
+            {
+                attackBoxHeavy.SetActive(true);
+                attackBoxHeavyBuffed.SetActive(false);
+            }
+
             m_canMove = false;
-            attackBoxHeavy.SetActive(true);
             attackTimerHeavy += Time.deltaTime;
             if (attackTimerHeavy > (attackDurationHeavy * speedScale))
             {
                 isHeavyAttacking = false;
                 attackBoxHeavy.SetActive(false);
+                attackBoxHeavyBuffed.SetActive(false);
                 canHeavyAttack = false;
                 m_canMove = true;
                 attackTimerHeavy = 0.0f;
+            }
+        }
+
+        void IsSpecialAttacking()
+        {
+            m_canMove = false;
+            attackTimerSpecial += Time.deltaTime;
+
+            if(specialsNeedsToHitGround && attackTimerSpecial < specialChargeDuration)
+            {
+                m_Character.StopMovement();
+            }
+
+            //Wait for charge before attacking
+            if (attackTimerSpecial > specialChargeDuration)
+            {
+                if (specialIsProjectile)
+                {
+                    if (!hasFiredProjectile)
+                    {
+                        GameObject projectileClone;
+                        projectileClone = Instantiate(attackBoxSpecial, attackBoxSpecial.transform.position, attackBoxSpecial.transform.rotation) as GameObject;
+                        projectileClone.SetActive(true);
+                        if (m_Character.m_FacingRight)
+                        {
+                            projectileClone.GetComponent<Rigidbody2D>().AddForce(Vector2.right * 1000);
+                        }
+                        else
+                        {
+                            projectileClone.GetComponent<Rigidbody2D>().AddForce(-Vector2.right * 1000);
+                        }
+                        hasFiredProjectile = true;
+                    }
+                }
+                else if(specialsNeedsToHitGround)
+                {
+                    m_Character.m_Rigidbody2D.AddForce(new Vector2(0, -100));
+                    if(m_Character.m_Grounded)
+                    {
+                        specialTimeOnGroundTimer += Time.deltaTime;
+                        attackBoxSpecial.SetActive(true);
+                        m_Character.StopMovement();
+                    }
+                }
+                else
+                {
+                    attackBoxSpecial.SetActive(true);
+                }
+            }
+
+            if ((!specialsNeedsToHitGround && (attackTimerSpecial > (attackDurationSpecial * speedScale))) || (specialsNeedsToHitGround && (specialTimeOnGroundTimer > specialTimeOnGroundDuration)))
+            {
+                isSpecialAttacking = false;
+                canSpecialAttack = false;
+                m_canMove = true;
+                attackTimerSpecial = 0.0f;
+                hasFiredProjectile = false;
+                attackBoxSpecial.SetActive(false);
+                specialTimeOnGroundTimer = 0.0f;
             }
         }
 
