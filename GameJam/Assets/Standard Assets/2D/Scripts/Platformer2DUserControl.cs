@@ -62,6 +62,8 @@ namespace UnityStandardAssets._2D
 
         public float currentHealthPercent = 0.0f;
 
+
+        bool canAttack = true;
         bool canLightAttack = true;
         bool isLightAttacking = false;
         float attackDurationLight = 0.2f;
@@ -105,328 +107,53 @@ namespace UnityStandardAssets._2D
 
         private void Update()
         {
+            //If was punched up, perform punch up action
             if (m_wasPunchedUp)
             {
-                m_punchUpTimer += Time.deltaTime;
-                m_canMove = false;
-                m_Character.UnfreezeRotation();
-
-                m_Character.m_Rigidbody2D.AddTorque(CrossPlatformInputManager.GetAxis(horizontalAxisButton) * 1);
-
-                if(m_punchUpTimer > (m_minPunchUpTime + ((m_minPunchUpTime * currentHealthPercent) / 100)))
-                {
-                    m_canShield = true;
-                    if (m_isShielding || (m_punchUpTimer > (m_maxPunchUpTime + ((m_maxPunchUpTime * currentHealthPercent) / 100))))
-                    {
-                        m_punchUpTimer = 0.0f;
-                        m_wasPunchedUp = false;
-                        m_wasHitSmall = false;
-                        m_wasHitBig = false;
-                        m_canMove = true;
-                        m_Character.ResetRotation();
-                    }
-                }
-                else
-                {
-                    m_canShield = false;
-                }
+                GetPunchedUp();
             }
             else
             {
+                //If was hit small, perform hit small action
                 if (m_wasHitSmall)
                 {
-                    m_canShield = false;
-                    m_canMove = false;
-                    m_hitSmallTimer += Time.deltaTime;
-                    if (m_hitSmallTimer > m_hitSmallDelay)
-                    {
-                        m_wasHitSmall = false;
-                        m_hitSmallTimer = 0.0f;
-                        m_canMove = true;
-                        m_canShield = true;
-                    }
+                    GetHitSmall();
                 }
 
+                //If was hit big, perform hit big action
                 if (m_wasHitBig)
                 {
-                    m_Character.UnfreezeRotation();
-
-                    m_Character.m_Rigidbody2D.AddTorque(CrossPlatformInputManager.GetAxis(horizontalAxisButton) * 1);
-
-                    m_canMove = false;
-                    m_hitBigTimer += Time.deltaTime;
-
-                    if (m_hitBigTimer > (m_minBigHitTime + ((m_minBigHitTime * currentHealthPercent) / 100))) 
-                    {
-                        m_canShield = true;
-
-                        if (m_hitBigTimer > (m_hitBigDelay + ((m_hitBigDelay * currentHealthPercent) / 100)) || m_isShielding)
-                        {
-                            m_wasHitBig = false;
-                            m_hitBigTimer = 0.0f;
-                            m_canMove = true;
-                            m_canShield = true;
-                            m_Character.ResetRotation();
-                        }
-                    }
-                    else
-                    {
-                        m_canShield = false;
-                    }
+                    GetHitBig();
                 }
             }
 
-            if(!m_canTakeDamage)
-            {
-                m_damageDelayTimer += Time.deltaTime;
-                if(m_damageDelayTimer > m_damageDelay)
-                {
-                    m_damageDelayTimer = 0.0f;
-                    m_canTakeDamage = true;
-                }
-            }
+            //Prevents player from taking damage too quickly between being attacked. Adds delay once hit, and they can't get hit until the timer is up.
+            DamageTakenDelayTimer();
+        
+            //Control for shield;
+            ShieldControl();
+            //Control for dodge.
+            DodgeControl();
 
-            if (!m_Character.m_Grounded && !m_isShielding)
-            {
-                if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) > 0)
-                {
-                    m_Character.AddDownForce();
-                }
-                else if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) < 0 && m_Character.CheckIfFalling())
-                {
-                    m_Character.AddUpForce();
-                }
-            }
+            //Air control, allows player to fall quicker or slower with movement stick
+            AirControlUpDown();
+            //Control for jumping
+            JumpControl();
 
+            //Control for light attack, starts the attack
+            LightAttackControl();
+            //Control for heavy attack, starts the attack.
+            HeavyAttackControl();
 
-            if (CrossPlatformInputManager.GetButton(jumpButton) && m_Character.m_Grounded)
-            {
-                m_isChargingJump = true;
-            }
-            else if(!m_Character.m_Grounded)
-            {
-                m_isChargingJump = false;
-            }  
-            
-            if(CrossPlatformInputManager.GetButton(fire2Button) && m_canShield)
-            {
-                if (!m_isDodging)
-                {
-                    m_Character.HalfGravityScale();
-                    m_Character.StopMovementHorizontal();
-                }
-
-                if(!m_isShielding)
-                {
-                    m_isAxisInUse = true;
-                    m_Character.StopMovement();
-                }
-
-                m_isShielding = true;
-
-                shieldSprite.SetActive(true);
-            }
-            else if(m_isShielding)
-            {
-                StopShielding();               
-            }
-
-            if(!m_canShield)
-            {
-                m_betweenShieldTimer += Time.deltaTime;
-                if(m_betweenShieldTimer > m_timeBetweenShield)
-                {
-                    m_canShield = true;
-                    m_betweenShieldTimer = 0.0f;
-                }
-            }
-
-            if(m_isShielding)
-            {
-                m_shieldChargeCurrent -= (m_shieldDrainRate * Time.deltaTime);
-                if(m_shieldChargeCurrent < 0)
-                {
-                    StopShielding();
-                    m_shieldChargeCurrent = 0;
-                }
-            }
-            else if(!m_isShielding && (m_shieldChargeCurrent < m_shieldChargeMax))
-            {
-                m_shieldChargeCurrent += (m_shieldRechargeRate * Time.deltaTime);
-                if(m_shieldChargeCurrent > m_shieldChargeMax)
-                {
-                    m_shieldChargeCurrent = m_shieldChargeMax;
-                }
-            }
-
-            if(m_isShielding && m_canDodge)
-            {
-                if(CrossPlatformInputManager.GetAxisRaw(horizontalAxisButton) != 0)
-                {
-                    if(!m_isAxisInUse)
-                    {
-                        if(CrossPlatformInputManager.GetAxisRaw(horizontalAxisButton) < 0)
-                        {
-                            m_Character.DodgeLeft();
-                        }
-                        else
-                        {
-                            m_Character.DodgeRight();
-                        }
-
-                        m_isDodging = true;
-                        m_isAxisInUse = true;
-                    }
-                }
-                if(CrossPlatformInputManager.GetAxisRaw(horizontalAxisButton) == 0)
-                {
-                    m_isAxisInUse = false;
-                }
-
-            }
-
-            if(!m_canDodge)
-            {
-                m_betweenDodgeTimer += Time.deltaTime;
-                if(m_betweenDodgeTimer > m_timeBetweenDodge)
-                {
-                    m_canDodge = true;
-                    m_betweenDodgeTimer = 0.0f;
-                }
-            }
-
-            if (m_isDodging)
-            {
-                playerCollider.enabled = false;
-                m_Character.StopGravityScale();
-                m_dodgeStopTimer += Time.deltaTime;
-                if (m_dodgeStopTimer > m_dodgeStopDuration)
-                {
-                    m_isDodging = false;
-                    m_Character.ResetGravityScale();
-                    m_dodgeStopTimer = 0.0f;
-
-                    m_canDodge = false;
-                    m_betweenDodgeTimer = 0.0f;
-                    playerCollider.enabled = true;
-                }
-
-                shieldSprite.SetActive(false);
-            }
-
-
-            if ((!m_Jump && (m_Character.m_timeSinceLastJump > m_Character.m_timeBetweenJump) && (m_Character.m_numberOfJumps < m_Character.m_jumpLimit) && !m_isShielding && m_canMove))
-            {
-                // Read the jump input in Update so button presses aren't missed.
-                if(m_isChargingJump)
-                {
-                    //Debug.Log("jump cur" + m_jumpPower + "max " + m_jumpPowerMax);
-                    m_jumpPower += m_JumpPowerGain * Time.deltaTime;
-                    if(m_jumpPower > m_jumpPowerMax)
-                    {
-                        //Debug.Log("jump");
-                        m_jumpPower = m_jumpPowerMax;
-                        m_Jump = true;
-                        m_isChargingJump = false;
-                    }
-
-                    if (CrossPlatformInputManager.GetButtonUp(jumpButton))
-                    {
-                        if (m_canMove)
-                        {
-                            m_Jump = true;
-                        }
-                        m_isChargingJump = false;
-                    }
-                }
-                else
-                {
-                    if (CrossPlatformInputManager.GetButtonDown(jumpButton))
-                    {
-                        if (m_canMove)
-                        {
-                            m_Jump = true;
-                        }
-                    }
-                }               
-            }
-
-            if(!canLightAttack)
-            {
-                lightAttackResetTimer += Time.deltaTime;
-                if(lightAttackResetTimer > lightAttackResetDuration)
-                {
-                    canLightAttack = true;
-                    lightAttackResetTimer = 0.0f;
-                }
-            }
-
-
-            if (!canHeavyAttack)
-            {
-                heavyAttackResetTimer += Time.deltaTime;
-                if (heavyAttackResetTimer > heavyAttackResetDuration)
-                {
-                    canHeavyAttack = true;
-                    heavyAttackResetTimer = 0.0f;
-                }
-            }
-
-            if (CrossPlatformInputManager.GetButtonDown(fireButton))
-            {
-                if(!isLightAttacking && !isHeavyAttacking && canLightAttack)
-                {
-                    isLightAttacking = true;
-                    m_Character.StopMovementVertical();
-
-                    if(m_Character.m_FacingRight)
-                    {
-                        m_Character.m_Rigidbody2D.AddForce(Vector2.right * 10, ForceMode2D.Impulse);
-                    }
-                    else
-                    {
-                        m_Character.m_Rigidbody2D.AddForce(-Vector2.right * 10, ForceMode2D.Impulse);
-                    }
-                    
-                }
-            }
-            else if (CrossPlatformInputManager.GetButtonDown(fire3Button))
-            {
-                if (!isLightAttacking && !isHeavyAttacking && canHeavyAttack)
-                {
-                    isHeavyAttacking = true;
-                    m_Character.StopMovementVertical();
-                    m_Character.m_Rigidbody2D.AddForce(Vector2.up * 15, ForceMode2D.Impulse);
-                }
-            }
-
+            //If is light attacking, perform light attack action.
             if (isLightAttacking)
             {
-                m_canMove = false;
-                attackBoxLight.SetActive(true);
-                attackTimerLight += Time.deltaTime;
-                if(attackTimerLight > attackDurationLight)
-                {
-                    isLightAttacking = false;
-                    attackTimerLight = 0.0f;
-                    attackBoxLight.SetActive(false);
-                    canLightAttack = false;
-                    m_canMove = true;
-                }
+                IsLightAttacking();
             }
+            //If is heavy attacking perform heavy attack action
             else if(isHeavyAttacking)
             {
-                m_canMove = false;
-                attackBoxHeavy.SetActive(true);
-                attackTimerHeavy += Time.deltaTime;
-                if (attackTimerHeavy > attackDurationHeavy)
-                {
-                    isHeavyAttacking = false;
-                    attackTimerHeavy = 0.0f;
-                    attackBoxHeavy.SetActive(false);
-                    canHeavyAttack = false;
-                    m_canMove = true;
-                }
+                IsHeavyAttacking();
             }
         }
 
@@ -496,6 +223,351 @@ namespace UnityStandardAssets._2D
             m_isShielding = false;
             shieldSprite.SetActive(false);
             m_canShield = false;
+        }
+
+        void GetPunchedUp()
+        {
+            m_punchUpTimer += Time.deltaTime;
+            m_canMove = false;
+            canAttack = false;
+
+            m_Character.UnfreezeRotation();            
+            m_Character.m_Rigidbody2D.AddTorque(CrossPlatformInputManager.GetAxis(horizontalAxisButton) * 1);
+
+            if (m_punchUpTimer > (m_minPunchUpTime + ((m_minPunchUpTime * currentHealthPercent) / 100)))
+            {
+                m_canShield = true;
+                if (m_isShielding || (m_punchUpTimer > (m_maxPunchUpTime + ((m_maxPunchUpTime * currentHealthPercent) / 100))))
+                {
+                    canAttack = true;
+                    m_punchUpTimer = 0.0f;
+                    m_wasPunchedUp = false;
+                    m_wasHitSmall = false;
+                    m_wasHitBig = false;
+                    m_canMove = true;
+                    m_Character.ResetRotation();
+                }
+            }
+            else
+            {
+                m_canShield = false;
+            }
+        }
+
+        void GetHitSmall()
+        {
+            m_canShield = false;
+            m_canMove = false;
+            m_hitSmallTimer += Time.deltaTime;
+            if (m_hitSmallTimer > m_hitSmallDelay)
+            {
+                m_wasHitSmall = false;
+                m_hitSmallTimer = 0.0f;
+                m_canMove = true;
+                m_canShield = true;
+            }
+        }
+
+        void GetHitBig()
+        {
+            m_Character.UnfreezeRotation();
+            m_Character.m_Rigidbody2D.AddTorque(CrossPlatformInputManager.GetAxis(horizontalAxisButton) * 1);
+
+            m_canMove = false;
+            m_hitBigTimer += Time.deltaTime;
+            canAttack = false;
+
+            if (m_hitBigTimer > (m_minBigHitTime + ((m_minBigHitTime * currentHealthPercent) / 100)))
+            {
+                m_canShield = true;
+
+                if (m_hitBigTimer > (m_hitBigDelay + ((m_hitBigDelay * currentHealthPercent) / 100)) || m_isShielding)
+                {
+                    canAttack = true;
+                    m_wasHitBig = false;
+                    m_hitBigTimer = 0.0f;
+                    m_canMove = true;
+                    m_canShield = true;
+                    m_Character.ResetRotation();
+                }
+            }
+            else
+            {
+                m_canShield = false;
+            }
+        }
+
+        void DamageTakenDelayTimer()
+        {
+            if (!m_canTakeDamage)
+            {
+                m_damageDelayTimer += Time.deltaTime;
+                if (m_damageDelayTimer > m_damageDelay)
+                {
+                    m_damageDelayTimer = 0.0f;
+                    m_canTakeDamage = true;
+                }
+            }
+        }
+
+        void AirControlUpDown()
+        {
+            if (!m_Character.m_Grounded && !m_isShielding)
+            {
+                if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) > 0)
+                {
+                    m_Character.AddDownForce();
+                }
+                else if (CrossPlatformInputManager.GetAxisRaw(verticalAxisButton) < 0 && m_Character.CheckIfFalling())
+                {
+                    m_Character.AddUpForce();
+                }
+            }
+        }
+
+        void ShieldControl()
+        {
+            if (CrossPlatformInputManager.GetButton(fire2Button) && m_canShield)
+            {
+                if (!m_isDodging)
+                {
+                    m_Character.HalfGravityScale();
+                    m_Character.StopMovementHorizontal();
+                }
+
+                if (!m_isShielding)
+                {
+                    m_isAxisInUse = true;
+                    m_Character.StopMovement();
+                }
+
+                m_isShielding = true;
+
+                shieldSprite.SetActive(true);
+            }
+            else if (m_isShielding)
+            {
+                StopShielding();
+            }
+
+            if (!m_canShield)
+            {
+                m_betweenShieldTimer += Time.deltaTime;
+                if (m_betweenShieldTimer > m_timeBetweenShield)
+                {
+                    m_canShield = true;
+                    m_betweenShieldTimer = 0.0f;
+                }
+            }
+
+            if (m_isShielding)
+            {
+                m_shieldChargeCurrent -= (m_shieldDrainRate * Time.deltaTime);
+                if (m_shieldChargeCurrent < 0)
+                {
+                    StopShielding();
+                    m_shieldChargeCurrent = 0;
+                }
+            }
+            else if (!m_isShielding && (m_shieldChargeCurrent < m_shieldChargeMax))
+            {
+                m_shieldChargeCurrent += (m_shieldRechargeRate * Time.deltaTime);
+                if (m_shieldChargeCurrent > m_shieldChargeMax)
+                {
+                    m_shieldChargeCurrent = m_shieldChargeMax;
+                }
+            }
+
+            if (m_isShielding && m_canDodge)
+            {
+                if (CrossPlatformInputManager.GetAxisRaw(horizontalAxisButton) != 0)
+                {
+                    if (!m_isAxisInUse)
+                    {
+                        if (CrossPlatformInputManager.GetAxisRaw(horizontalAxisButton) < 0)
+                        {
+                            m_Character.DodgeLeft();
+                        }
+                        else
+                        {
+                            m_Character.DodgeRight();
+                        }
+
+                        m_isDodging = true;
+                        m_isAxisInUse = true;
+                    }
+                }
+                if (CrossPlatformInputManager.GetAxisRaw(horizontalAxisButton) == 0)
+                {
+                    m_isAxisInUse = false;
+                }
+
+            }
+        }
+
+        void DodgeControl()
+        {
+            if (!m_canDodge)
+            {
+                m_betweenDodgeTimer += Time.deltaTime;
+                if (m_betweenDodgeTimer > m_timeBetweenDodge)
+                {
+                    m_canDodge = true;
+                    m_betweenDodgeTimer = 0.0f;
+                }
+            }
+
+            if (m_isDodging)
+            {
+                playerCollider.enabled = false;
+                m_Character.StopGravityScale();
+                m_dodgeStopTimer += Time.deltaTime;
+                if (m_dodgeStopTimer > m_dodgeStopDuration)
+                {
+                    m_isDodging = false;
+                    m_Character.ResetGravityScale();
+                    m_dodgeStopTimer = 0.0f;
+
+                    m_canDodge = false;
+                    m_betweenDodgeTimer = 0.0f;
+                    playerCollider.enabled = true;
+                }
+
+                shieldSprite.SetActive(false);
+            }
+        }
+
+        void JumpControl()
+        {
+            if (CrossPlatformInputManager.GetButton(jumpButton) && m_Character.m_Grounded)
+            {
+                m_isChargingJump = true;
+            }
+            else if (!m_Character.m_Grounded)
+            {
+                m_isChargingJump = false;
+            }
+
+            if ((!m_Jump && (m_Character.m_timeSinceLastJump > m_Character.m_timeBetweenJump) && (m_Character.m_numberOfJumps < m_Character.m_jumpLimit) && !m_isShielding && m_canMove))
+            {
+                // Read the jump input in Update so button presses aren't missed.
+                if (m_isChargingJump)
+                {
+                    //Debug.Log("jump cur" + m_jumpPower + "max " + m_jumpPowerMax);
+                    m_jumpPower += m_JumpPowerGain * Time.deltaTime;
+                    if (m_jumpPower > m_jumpPowerMax)
+                    {
+                        //Debug.Log("jump");
+                        m_jumpPower = m_jumpPowerMax;
+                        m_Jump = true;
+                        m_isChargingJump = false;
+                    }
+
+                    if (CrossPlatformInputManager.GetButtonUp(jumpButton))
+                    {
+                        if (m_canMove)
+                        {
+                            m_Jump = true;
+                        }
+                        m_isChargingJump = false;
+                    }
+                }
+                else
+                {
+                    if (CrossPlatformInputManager.GetButtonDown(jumpButton))
+                    {
+                        if (m_canMove)
+                        {
+                            m_Jump = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        void LightAttackControl()
+        {
+            if (!canLightAttack)
+            {
+                lightAttackResetTimer += Time.deltaTime;
+                if (lightAttackResetTimer > lightAttackResetDuration)
+                {
+                    canLightAttack = true;
+                    lightAttackResetTimer = 0.0f;
+                }
+            }
+
+            if (CrossPlatformInputManager.GetButtonDown(fireButton) && canAttack)
+            {
+                if (!isLightAttacking && !isHeavyAttacking && canLightAttack)
+                {
+                    isLightAttacking = true;
+                    m_Character.StopMovementVertical();
+
+                    if (m_Character.m_FacingRight)
+                    {
+                        m_Character.m_Rigidbody2D.AddForce(Vector2.right * 10, ForceMode2D.Impulse);
+                    }
+                    else
+                    {
+                        m_Character.m_Rigidbody2D.AddForce(-Vector2.right * 10, ForceMode2D.Impulse);
+                    }
+
+                }
+            }
+        }
+
+        void HeavyAttackControl()
+        {
+            if (!canHeavyAttack)
+            {
+                heavyAttackResetTimer += Time.deltaTime;
+                if (heavyAttackResetTimer > heavyAttackResetDuration)
+                {
+                    canHeavyAttack = true;
+                    heavyAttackResetTimer = 0.0f;
+                }
+            }
+
+            if (CrossPlatformInputManager.GetButtonDown(fire3Button) && canAttack)
+            {
+                if (!isLightAttacking && !isHeavyAttacking && canHeavyAttack)
+                {
+                    isHeavyAttacking = true;
+                    m_Character.StopMovementVertical();
+                    m_Character.m_Rigidbody2D.AddForce(Vector2.up * 15, ForceMode2D.Impulse);
+                }
+            }
+        }
+
+        void IsLightAttacking()
+        {
+            m_canMove = false;
+            attackBoxLight.SetActive(true);
+            attackTimerLight += Time.deltaTime;
+            if (attackTimerLight > attackDurationLight)
+            {
+                isLightAttacking = false;
+                attackTimerLight = 0.0f;
+                attackBoxLight.SetActive(false);
+                canLightAttack = false;
+                m_canMove = true;
+            }
+        }
+
+        void IsHeavyAttacking()
+        {
+            m_canMove = false;
+            attackBoxHeavy.SetActive(true);
+            attackTimerHeavy += Time.deltaTime;
+            if (attackTimerHeavy > attackDurationHeavy)
+            {
+                isHeavyAttacking = false;
+                attackTimerHeavy = 0.0f;
+                attackBoxHeavy.SetActive(false);
+                canHeavyAttack = false;
+                m_canMove = true;
+            }
         }
     }
 }
