@@ -248,5 +248,10 @@ namespace UnityStandardAssets._2D
         {
             m_Rigidbody2D.AddForce(new Vector2(0.0f, force), ForceMode2D.Impulse);
         }
+
+        public void SetGravityScale(float modifier)
+        {
+            m_Rigidbody2D.gravityScale = m_gravityScaleDefault * modifier;
+        }
     }
 }

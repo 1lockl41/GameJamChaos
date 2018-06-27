@@ -62,7 +62,6 @@ namespace UnityStandardAssets._2D
 
         public float currentHealthPercent = 0.0f;
 
-
         bool canAttack = true;
         bool canLightAttack = true;
         bool isLightAttacking = false;
@@ -90,6 +89,12 @@ namespace UnityStandardAssets._2D
 
         BoxCollider2D playerCollider;
 
+        public bool isBuffed;
+        public float buffAmount;
+        bool hasStartedBuff;
+        float startScaleX;
+        float startScaleY;
+
         private void Awake()
         {
             UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
@@ -98,6 +103,9 @@ namespace UnityStandardAssets._2D
             m_jumpPower = m_jumpPowerMin;
             playerCollider = GetComponent<BoxCollider2D>();
             m_shieldChargeCurrent = m_shieldChargeMax;
+
+            startScaleX = this.transform.localScale.x;
+            startScaleY = this.transform.localScale.y;
         }
 
         private void OnEnable()
@@ -107,6 +115,25 @@ namespace UnityStandardAssets._2D
 
         private void Update()
         {
+            if (isBuffed)
+            {
+                if (!hasStartedBuff)
+                {
+                    transform.localScale = new Vector2((startScaleX * 1.2f) + ((startScaleX * buffAmount * 1.5f) / 100), (startScaleY * 1.2f) + ((startScaleY * buffAmount * 1.5f) / 100));
+                    transform.position = new Vector2(this.transform.position.x, this.transform.position.y + 3.0f);
+                    hasStartedBuff = true;
+                }
+            }
+            else
+            {
+                if (hasStartedBuff)
+                {
+                    transform.localScale = new Vector2(startScaleX, startScaleY);
+                    hasStartedBuff = false;
+                }
+            }
+
+
             //If was punched up, perform punch up action
             if (m_wasPunchedUp)
             {
@@ -156,7 +183,6 @@ namespace UnityStandardAssets._2D
                 IsHeavyAttacking();
             }
         }
-
 
         private void FixedUpdate()
         {
@@ -453,11 +479,9 @@ namespace UnityStandardAssets._2D
                 // Read the jump input in Update so button presses aren't missed.
                 if (m_isChargingJump)
                 {
-                    //Debug.Log("jump cur" + m_jumpPower + "max " + m_jumpPowerMax);
                     m_jumpPower += m_JumpPowerGain * Time.deltaTime;
                     if (m_jumpPower > m_jumpPowerMax)
                     {
-                        //Debug.Log("jump");
                         m_jumpPower = m_jumpPowerMax;
                         m_Jump = true;
                         m_isChargingJump = false;
