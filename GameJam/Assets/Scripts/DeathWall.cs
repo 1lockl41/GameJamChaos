@@ -9,13 +9,7 @@ public class DeathWall : MonoBehaviour {
     {
         if(collision.transform.tag == "Player" && !collision.isTrigger)
         {
-            //collision.gameObject.GetComponent<name of scrips> ().death == true;
-
-
+            collision.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().KillPlayer();
         }
-    
-
     }
-
-
 }

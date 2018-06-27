@@ -593,5 +593,16 @@ namespace UnityStandardAssets._2D
                 m_canMove = true;
             }
         }
+
+        public void KillPlayer()
+        {
+            this.gameObject.SetActive(false);
+        }
+
+        public void RespawnPlayer()
+        {
+            m_shieldChargeCurrent = m_shieldChargeMax;
+            currentHealthPercent = 0.0f;
+        }
     }
 }
