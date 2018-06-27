@@ -68,6 +68,7 @@ namespace UnityStandardAssets._2D
         float attackDurationLight = 0.2f;
         float attackTimerLight = 0.0f;
         public GameObject attackBoxLight;
+        public GameObject attackBoxLightBuffed;
 
         bool canHeavyAttack = true;
         bool isHeavyAttacking = false;
@@ -89,13 +90,15 @@ namespace UnityStandardAssets._2D
         public string horizontalAxisDpad;
         public string verticalAxisDpad;
 
-        BoxCollider2D playerCollider;
-
         public bool isBuffed;
         public float buffAmount;
+        float startBuffAmount;
+        float buffDrainRate = 4.0f;
         bool hasStartedBuff;
         float startScaleX;
         float startScaleY;
+        [HideInInspector]
+        public float speedScale = 1.0f;
 
         private void Awake()
         {
@@ -103,7 +106,6 @@ namespace UnityStandardAssets._2D
 
             m_Character = GetComponent<PlatformerCharacter2D>();
             m_jumpPower = m_jumpPowerMin;
-            playerCollider = GetComponent<BoxCollider2D>();
             m_shieldChargeCurrent = m_shieldChargeMax;
 
             startScaleX = this.transform.localScale.x;
@@ -121,17 +123,43 @@ namespace UnityStandardAssets._2D
             {
                 if (!hasStartedBuff)
                 {
-                    transform.localScale = new Vector3((startScaleX * 1.2f) + ((startScaleX * buffAmount) / 100), (startScaleY * 1.2f) + ((startScaleY * buffAmount) / 100), transform.localScale.z);
+                    speedScale = speedScale + ((speedScale * buffAmount) / (100 + 25));
+                    transform.localScale = new Vector3((startScaleX * 1.2f) + ((startScaleX * buffAmount) / 100), (startScaleY * 1.2f) + ((startScaleY * buffAmount) / 100));
+
+                    if(!m_Character.m_FacingRight)
+                    {
+                        Vector3 tempScale = transform.localScale;
+                        tempScale.x = -tempScale.x;
+                        transform.localScale = tempScale;
+                    }
+
                     transform.position = new Vector2(this.transform.position.x, this.transform.position.y + 3.0f);
                     hasStartedBuff = true;
+                }
+
+                buffAmount -= buffDrainRate * Time.deltaTime;
+                if(buffAmount < 0)
+                {
+                    isBuffed = false;
+                    buffAmount = 0;
                 }
             }
             else
             {
+                speedScale = 1.0f;
                 if (hasStartedBuff)
                 {
                     transform.localScale = new Vector2(startScaleX, startScaleY);
+
+                    if (!m_Character.m_FacingRight)
+                    {
+                        Vector3 tempScale = transform.localScale;
+                        tempScale.x = -tempScale.x;
+                        transform.localScale = tempScale;
+                    }
+
                     hasStartedBuff = false;
+                    m_Character.ResetGravityScale();
                 }
             }
 
@@ -447,7 +475,6 @@ namespace UnityStandardAssets._2D
 
             if (m_isDodging)
             {
-                playerCollider.enabled = false;
                 m_Character.StopGravityScale();
                 m_dodgeStopTimer += Time.deltaTime;
                 if (m_dodgeStopTimer > m_dodgeStopDuration)
@@ -458,7 +485,6 @@ namespace UnityStandardAssets._2D
 
                     m_canDodge = false;
                     m_betweenDodgeTimer = 0.0f;
-                    playerCollider.enabled = true;
                 }
 
                 shieldSprite.SetActive(false);
@@ -516,7 +542,7 @@ namespace UnityStandardAssets._2D
             if (!canLightAttack)
             {
                 lightAttackResetTimer += Time.deltaTime;
-                if (lightAttackResetTimer > lightAttackResetDuration)
+                if (lightAttackResetTimer > (lightAttackResetDuration * speedScale))
                 {
                     canLightAttack = true;
                     lightAttackResetTimer = 0.0f;
@@ -532,11 +558,11 @@ namespace UnityStandardAssets._2D
 
                     if (m_Character.m_FacingRight)
                     {
-                        m_Character.m_Rigidbody2D.AddForce(Vector2.right * 10, ForceMode2D.Impulse);
+                         m_Character.m_Rigidbody2D.AddForce(Vector2.right * (10 * speedScale), ForceMode2D.Impulse);
                     }
                     else
                     {
-                        m_Character.m_Rigidbody2D.AddForce(-Vector2.right * 10, ForceMode2D.Impulse);
+                        m_Character.m_Rigidbody2D.AddForce(-Vector2.right * (10 * speedScale), ForceMode2D.Impulse);
                     }
 
                 }
@@ -568,14 +594,25 @@ namespace UnityStandardAssets._2D
 
         void IsLightAttacking()
         {
+            if(isBuffed)
+            {
+                attackBoxLightBuffed.SetActive(true);
+                attackBoxLight.SetActive(false);
+            }
+            else
+            {
+                attackBoxLight.SetActive(true);
+                attackBoxLightBuffed.SetActive(false);
+            }
+
             m_canMove = false;
-            attackBoxLight.SetActive(true);
             attackTimerLight += Time.deltaTime;
-            if (attackTimerLight > attackDurationLight)
+            if (attackTimerLight > (attackDurationLight * speedScale))
             {
                 isLightAttacking = false;
                 attackTimerLight = 0.0f;
                 attackBoxLight.SetActive(false);
+                attackBoxLightBuffed.SetActive(false);
                 canLightAttack = false;
                 m_canMove = true;
             }
@@ -586,18 +623,20 @@ namespace UnityStandardAssets._2D
             m_canMove = false;
             attackBoxHeavy.SetActive(true);
             attackTimerHeavy += Time.deltaTime;
-            if (attackTimerHeavy > attackDurationHeavy)
+            if (attackTimerHeavy > (attackDurationHeavy * speedScale))
             {
                 isHeavyAttacking = false;
-                attackTimerHeavy = 0.0f;
                 attackBoxHeavy.SetActive(false);
                 canHeavyAttack = false;
                 m_canMove = true;
+                attackTimerHeavy = 0.0f;
             }
         }
 
         public void KillPlayer()
         {
+            isBuffed = false;
+            buffAmount = 0.0f;
             this.gameObject.SetActive(false);
         }
 
