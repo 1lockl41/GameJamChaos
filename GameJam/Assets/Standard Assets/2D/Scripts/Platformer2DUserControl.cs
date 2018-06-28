@@ -700,6 +700,10 @@ namespace UnityStandardAssets._2D
             {
                 m_Character.StopMovement();
             }
+            else if (!specialsNeedsToHitGround)
+            {
+                m_Character.StopMovement();
+            }
 
             //Wait for charge before attacking
             if (attackTimerSpecial > specialChargeDuration)
@@ -713,11 +717,11 @@ namespace UnityStandardAssets._2D
                         projectileClone.SetActive(true);
                         if (m_Character.m_FacingRight)
                         {
-                            projectileClone.GetComponent<Rigidbody2D>().AddForce(Vector2.right * 1000);
+                            projectileClone.GetComponent<Rigidbody2D>().AddForce(Vector2.right * 500);
                         }
                         else
                         {
-                            projectileClone.GetComponent<Rigidbody2D>().AddForce(-Vector2.right * 1000);
+                            projectileClone.GetComponent<Rigidbody2D>().AddForce(-Vector2.right * 500);
                         }
                         hasFiredProjectile = true;
                     }

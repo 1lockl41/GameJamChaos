@@ -1994,7 +1994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ee0f779e20d0d64e8b98c50fe700a68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 5
+  damage: 15
   punchUp: 0
   isProjectile: 1
 --- !u!23 &781826795
@@ -2046,8 +2046,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 781826790}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.54, y: -0.12999988, z: 0}
-  m_LocalScale: {x: 0.3259037, y: 0.22272831, z: 0.19781}
+  m_LocalPosition: {x: 0.55, y: -0.12999988, z: 0}
+  m_LocalScale: {x: 0.40737963, y: 0.8398563, z: 0.19781}
   m_Children: []
   m_Father: {fileID: 385348212}
   m_RootOrder: 7
@@ -4429,12 +4429,12 @@ Prefab:
     - target: {fileID: 114710300702815296, guid: 5c177b5ab69b0d64480cc308360761fc,
         type: 2}
       propertyPath: attackDurationSpecial
-      value: 0.5
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 114710300702815296, guid: 5c177b5ab69b0d64480cc308360761fc,
         type: 2}
       propertyPath: specialChargeDuration
-      value: 0.2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 114710300702815296, guid: 5c177b5ab69b0d64480cc308360761fc,
         type: 2}
