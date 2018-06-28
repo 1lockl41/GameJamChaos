@@ -13,10 +13,10 @@ public class UI_Percentage : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        p1HP = player1.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().currentHealthPercent;
-        p2HP = player2.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().currentHealthPercent;
-        p3HP = player3.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().currentHealthPercent;
-        p4HP = player4.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().currentHealthPercent;
+        p1HP = player1.GetComponent<Platformer2DUserControl>().currentHealthPercent;
+        p2HP = player2.GetComponent<Platformer2DUserControl>().currentHealthPercent;
+        p3HP = player3.GetComponent<Platformer2DUserControl>().currentHealthPercent;
+        p4HP = player4.GetComponent<Platformer2DUserControl>().currentHealthPercent;
 
         UpdatePercentage();
     }

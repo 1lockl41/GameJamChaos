@@ -33,7 +33,7 @@ public class PlayerRespawner : MonoBehaviour
                 player1.transform.position = SelectRandomRespawn().transform.position;
                 player1.SetActive(true);
                 player1respawnTimer = 0.0f;
-                player1.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().RespawnPlayer();
+                player1.GetComponent<Platformer2DUserControl>().RespawnPlayer();
             }
         }
 
@@ -45,7 +45,7 @@ public class PlayerRespawner : MonoBehaviour
                 player2.transform.position = SelectRandomRespawn().transform.position;
                 player2.SetActive(true);
                 player2respawnTimer = 0.0f;
-                player2.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().RespawnPlayer();
+                player2.GetComponent<Platformer2DUserControl>().RespawnPlayer();
             }
         }
 
@@ -57,7 +57,7 @@ public class PlayerRespawner : MonoBehaviour
                 player3.transform.position = SelectRandomRespawn().transform.position;
                 player3.SetActive(true);
                 player3respawnTimer = 0.0f;
-                player3.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().RespawnPlayer();
+                player3.GetComponent<Platformer2DUserControl>().RespawnPlayer();
             }
         }
 
@@ -69,7 +69,7 @@ public class PlayerRespawner : MonoBehaviour
                 player4.transform.position = SelectRandomRespawn().transform.position;
                 player4.SetActive(true);
                 player4respawnTimer = 0.0f;
-                player4.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().RespawnPlayer();
+                player4.GetComponent<Platformer2DUserControl>().RespawnPlayer();
             }
         }
     }

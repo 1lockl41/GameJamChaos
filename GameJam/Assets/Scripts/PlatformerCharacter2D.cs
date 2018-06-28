@@ -1,8 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace UnityStandardAssets._2D
-{
+
     [RequireComponent(typeof(Platformer2DUserControl))]
     public class PlatformerCharacter2D : MonoBehaviour
     {
@@ -255,4 +254,4 @@ namespace UnityStandardAssets._2D
             m_Rigidbody2D.gravityScale = m_gravityScaleDefault * modifier;
         }
     }
-}
+

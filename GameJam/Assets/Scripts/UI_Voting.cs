@@ -17,6 +17,7 @@ public class UI_Voting : MonoBehaviour {
 
     public GameObject VotingArrows;
 
+    public GameController controller;
 
     void Vote_Count()
     {
@@ -33,31 +34,47 @@ public class UI_Voting : MonoBehaviour {
             Yellow = 0;
             Blue = 0;
             Green = 0;
-            
-            //StartCoroutine(TextWait());
-            //Red_Voted.gameObject.SetActive(false);
+            controller.allPlayers[0].GetComponent<Platformer2DUserControl>().SetHealth(999);
             //Set players percentage to 999 here
         }
 
         else if (Yellow >= 3)
         {
             Yellow_Voted.gameObject.SetActive(true);
-           // StartCoroutine(VoteWait());
-           // Yellow_Voted.gameObject.SetActive(false);
+            Invoke("DisableText", 3f);
+            Red = 0;
+            Yellow = 0;
+            Blue = 0;
+            Green = 0;
+            controller.allPlayers[3].GetComponent<Platformer2DUserControl>().SetHealth(999);
+            // StartCoroutine(VoteWait());
+            // Yellow_Voted.gameObject.SetActive(false);
             //set players percentage to 999 here
         }
         else if (Green >= 3)
         {
             Green_Voted.gameObject.SetActive(true);
-           // StartCoroutine(VoteWait());
-           // Green_Voted.gameObject.SetActive(false);
+            Invoke("DisableText", 3f);
+            Red = 0;
+            Yellow = 0;
+            Blue = 0;
+            Green = 0;
+            controller.allPlayers[2].GetComponent<Platformer2DUserControl>().SetHealth(999);
+            // StartCoroutine(VoteWait());
+            // Green_Voted.gameObject.SetActive(false);
             //set players percentage to 999 here
         }
         else if (Blue >= 3)
         {
             Blue_Voted.gameObject.SetActive(true);
-           // StartCoroutine(VoteWait());
-           // Blue_Voted.gameObject.SetActive(false);
+            Invoke("DisableText", 3f);
+            Red = 0;
+            Yellow = 0;
+            Blue = 0;
+            Green = 0;
+            controller.allPlayers[1].GetComponent<Platformer2DUserControl>().SetHealth(999);
+            // StartCoroutine(VoteWait());
+            // Blue_Voted.gameObject.SetActive(false);
             //set players percentage to 999 here
         }
     }
@@ -542,7 +559,50 @@ public class UI_Voting : MonoBehaviour {
             StartCoroutine(VoteWait());
         }
 
-        Vote_Count();
+        if (VotingArrows.gameObject.activeInHierarchy)
+        {
+            Vote_Count();
+        }
+        else
+        {
+            Green = 0;
+            Blue = 0;
+            Red = 0;
+            Yellow = 0;
+
+            Choice_Blue = false;
+            Choice_Blue2 = false;
+            Choice_Blue3 = false;
+            Choice_Blue4 = false;
+            Choice_Green = false;
+            Choice_Green2 = false;
+            Choice_Green3 = false;
+            Choice_Green4 = false;
+            Choice_Red = false;
+            Choice_Red2 = false;
+            Choice_Red4 = false;
+            Choice_Red3 = false;
+            Choice_Yellow = false;
+            Choice_Yellow2 = false;
+            Choice_Yellow3 = false;
+            Choice_Yellow4 = false;
+            p1votedB = false;
+            p1votedG = false;
+            p1votedR = false;
+            p1votedY = false;
+            p2votedB = false;
+            p2votedG = false;
+            p2votedR = false;
+            p2votedY = false;
+            p3votedB = false;
+            p3votedG = false;
+            p3votedR = false;
+            p3votedY = false;
+            p4votedB = false;
+            p4votedG = false;
+            p4votedR = false;
+            p4votedY = false;
+        }
 
     }
 
@@ -553,11 +613,18 @@ public class UI_Voting : MonoBehaviour {
         WaitCompleted = true;
     }
 
-    void DisableText()
+    public void DisableText()
     {
         Red_Voted.gameObject.SetActive(false);
+        Green_Voted.gameObject.SetActive(false);
+        Blue_Voted.gameObject.SetActive(false);
+        Yellow_Voted.gameObject.SetActive(false);
         VotingArrows.gameObject.SetActive(false);
     }
 
+    public void EnableArrows()
+    {
+        VotingArrows.gameObject.SetActive(true);
+    }
 
 }

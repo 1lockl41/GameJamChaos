@@ -40,7 +40,7 @@ public class PlayerDamageTrigger : MonoBehaviour
                 pushPoint = new Vector2(this.transform.position.x, this.transform.position.y);
             }
 
-            col.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>().TakeDamage(damage, pushPoint, punchUp);
+            col.GetComponent<Platformer2DUserControl>().TakeDamage(damage, pushPoint, punchUp);
 
             if(isProjectile)
             {

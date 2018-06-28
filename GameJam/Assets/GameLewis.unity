@@ -695,14 +695,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9256bbe75adbd734cb629f30a514a123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player1: {fileID: 877448975}
-  player2: {fileID: 1287747159}
-  player3: {fileID: 1792755762}
+  player1: {fileID: 1287747159}
+  player2: {fileID: 1792755762}
+  player3: {fileID: 877448975}
   player4: {fileID: 1077167064}
   p1HpTxt: {fileID: 1447791649}
   p2HpTxt: {fileID: 1739679842}
   p3HpTxt: {fileID: 653146694}
   p4HpTxt: {fileID: 1170994753}
+--- !u!114 &374395368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 374395361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a9074d03fd764439d64e76c7515703, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allPlayers:
+  - {fileID: 877448975}
+  - {fileID: 1287747159}
+  - {fileID: 1792755762}
+  - {fileID: 1077167064}
+  currentlySelectedPlayer: {fileID: 0}
+  shouldPickNewPlayer: 0
+  powerChargeRate: 2
+  powerDrainRate: 4
+  bumperPlayer1: LeftBumperPlayer1
+  bumperPlayer2: LeftBumperPlayer2
+  bumperPlayer3: LeftBumperPlayer3
+  bumperPlayer4: LeftBumperPlayer4
+  voter: {fileID: 1575684289}
 --- !u!1001 &382161455
 Prefab:
   m_ObjectHideFlags: 0
@@ -2375,6 +2400,14 @@ Prefab:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 1934421579546668, guid: 55d87d8531dd540488dd311dc4e75ad7, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1204892686341920, guid: 55d87d8531dd540488dd311dc4e75ad7, type: 2}
+      propertyPath: m_Name
+      value: PlayerBlue
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 55d87d8531dd540488dd311dc4e75ad7, type: 2}
   m_IsPrefabParent: 0
@@ -2747,6 +2780,10 @@ Prefab:
       propertyPath: respawnTime
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1084069988409138, guid: 44492427d19b725489c35fb3a17f5d98, type: 2}
+      propertyPath: m_TagString
+      value: GameController
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 44492427d19b725489c35fb3a17f5d98, type: 2}
   m_IsPrefabParent: 0
@@ -3088,8 +3125,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 773d5559ee7120e40b411fb4396552a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxCharge: 100
-  CurrCharge: 0
   PowerChargeImage: {fileID: 1419313935}
   ChargeText: {fileID: 263726521}
 --- !u!114 &1419313935
@@ -3315,6 +3350,14 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 1842555366809888, guid: 4071439fdf8843c4a841a88fa85c94f6, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729729865342284, guid: 4071439fdf8843c4a841a88fa85c94f6, type: 2}
+      propertyPath: m_Name
+      value: PlayerYellow
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 4071439fdf8843c4a841a88fa85c94f6, type: 2}
   m_IsPrefabParent: 0
@@ -3431,6 +3474,14 @@ Prefab:
       propertyPath: m_RootOrder
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 1873682368714618, guid: 1d2d2f59af16e334daef45870a70c1ff, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1327181309535126, guid: 1d2d2f59af16e334daef45870a70c1ff, type: 2}
+      propertyPath: m_Name
+      value: PlayerGreen
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1d2d2f59af16e334daef45870a70c1ff, type: 2}
   m_IsPrefabParent: 0
@@ -3497,6 +3548,7 @@ MonoBehaviour:
   Green: 0
   Yellow: 0
   VotingArrows: {fileID: 1508497167}
+  controller: {fileID: 374395368}
   player1AxisVertical: VerticalDpadPlayer1
   player1AxisHorizontal: HorizontalDpadPlayer1
   player2AxisVertical: VerticalDpadPlayer2
@@ -3543,6 +3595,14 @@ Prefab:
     - target: {fileID: 4551608574419922, guid: 5c177b5ab69b0d64480cc308360761fc, type: 2}
       propertyPath: m_RootOrder
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1796706007711630, guid: 5c177b5ab69b0d64480cc308360761fc, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992162362991700, guid: 5c177b5ab69b0d64480cc308360761fc, type: 2}
+      propertyPath: m_Name
+      value: PlayerRed
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5c177b5ab69b0d64480cc308360761fc, type: 2}
