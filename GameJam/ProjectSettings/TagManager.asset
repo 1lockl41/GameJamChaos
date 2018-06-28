@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Death
   - RespawnPoint
+  - PowerUpPoint
   layers:
   - Default
   - TransparentFX
