@@ -30,7 +30,7 @@ namespace UnityStandardAssets._2D
         public bool m_isShielding = false;
         float m_timeBetweenShield = 0.8f;
         float m_betweenShieldTimer = 0.0f;
-        bool m_canShield = true;
+        public bool m_canShield = true;
         public float m_shieldChargeCurrent = 0.0f;
         float m_shieldChargeMax = 100.0f;
         float m_shieldRechargeRate = 45.0f;
@@ -90,6 +90,7 @@ namespace UnityStandardAssets._2D
         public float specialChargeDuration = 0.4f;
         public bool specialsNeedsToHitGround = false;
         public bool canOnlyUseSpecialInAir = false;
+        public bool canOnlyUseSpecialOnGround = false;
         float specialTimeOnGroundDuration = 0.6f;
         float specialTimeOnGroundTimer = 0.0f;
 
@@ -106,6 +107,7 @@ namespace UnityStandardAssets._2D
         public string fireButton;
         public string fire2Button;
         public string fire3Button;
+        public string triggersButton;
 
         public bool isBuffed;
         public float buffAmount;
@@ -217,7 +219,7 @@ namespace UnityStandardAssets._2D
             //Control for light attack, starts the attack
             LightAttackControl();
             //Control for heavy attack, starts the attack.
-            //HeavyAttackControl();
+            HeavyAttackControl();
             SpecialAttackControl();
 
             //If is light attacking, perform light attack action.
@@ -405,7 +407,7 @@ namespace UnityStandardAssets._2D
 
         void ShieldControl()
         {
-            if (CrossPlatformInputManager.GetButton(fire2Button) && m_canShield)
+            if ((CrossPlatformInputManager.GetAxis(triggersButton) > 0) && m_canShield)
             {
                 if (!m_isDodging)
                 {
@@ -626,14 +628,17 @@ namespace UnityStandardAssets._2D
                 }
             }
 
-            if (CrossPlatformInputManager.GetButtonDown(fire3Button) && canAttack)
+            if (CrossPlatformInputManager.GetButton(fire2Button) && canAttack)
             {
                 if (canOnlyUseSpecialInAir && !m_Character.m_Grounded || !canOnlyUseSpecialInAir)
                 {
-                    if (!isLightAttacking && !isHeavyAttacking && !isSpecialAttacking && canSpecialAttack)
+                    if (canOnlyUseSpecialOnGround && m_Character.m_Grounded || !canOnlyUseSpecialOnGround)
                     {
-                        isSpecialAttacking = true;
-                        m_Character.StopMovement();
+                        if (!isLightAttacking && !isHeavyAttacking && !isSpecialAttacking && canSpecialAttack)
+                        {
+                            isSpecialAttacking = true;
+                            m_Character.StopMovement();
+                        }
                     }
                 }
             }
@@ -652,6 +657,7 @@ namespace UnityStandardAssets._2D
                 attackBoxLightBuffed.SetActive(false);
             }
 
+            m_canShield = false;
             m_canMove = false;
             attackTimerLight += Time.deltaTime;
             if (attackTimerLight > (attackDurationLight * speedScale))
@@ -662,6 +668,7 @@ namespace UnityStandardAssets._2D
                 attackBoxLightBuffed.SetActive(false);
                 canLightAttack = false;
                 m_canMove = true;
+                m_canShield = true;
             }
         }
 
@@ -678,6 +685,7 @@ namespace UnityStandardAssets._2D
                 attackBoxHeavyBuffed.SetActive(false);
             }
 
+            m_canShield = false;
             m_canMove = false;
             attackTimerHeavy += Time.deltaTime;
             if (attackTimerHeavy > (attackDurationHeavy * speedScale))
@@ -687,12 +695,14 @@ namespace UnityStandardAssets._2D
                 attackBoxHeavyBuffed.SetActive(false);
                 canHeavyAttack = false;
                 m_canMove = true;
+                m_canShield = true;
                 attackTimerHeavy = 0.0f;
             }
         }
 
         void IsSpecialAttacking()
         {
+            m_canShield = false;
             m_canMove = false;
             attackTimerSpecial += Time.deltaTime;
 
@@ -715,6 +725,7 @@ namespace UnityStandardAssets._2D
                         GameObject projectileClone;
                         projectileClone = Instantiate(attackBoxSpecial, attackBoxSpecial.transform.position, attackBoxSpecial.transform.rotation) as GameObject;
                         projectileClone.SetActive(true);
+                        projectileClone.transform.localScale = new Vector3(projectileClone.transform.localScale.x + Mathf.Abs(this.gameObject.transform.localScale.x), projectileClone.transform.localScale.y + this.gameObject.transform.localScale.y, 1.0f);
                         if (m_Character.m_FacingRight)
                         {
                             projectileClone.GetComponent<Rigidbody2D>().AddForce(Vector2.right * 500);
@@ -738,6 +749,11 @@ namespace UnityStandardAssets._2D
                 }
                 else
                 {
+                    if(canOnlyUseSpecialOnGround)
+                    {
+                        m_Character.m_Rigidbody2D.AddForce(new Vector2(0, 800));
+                    }
+
                     attackBoxSpecial.SetActive(true);
                 }
             }
@@ -751,6 +767,7 @@ namespace UnityStandardAssets._2D
                 hasFiredProjectile = false;
                 attackBoxSpecial.SetActive(false);
                 specialTimeOnGroundTimer = 0.0f;
+                m_canShield = true;
             }
         }
 
