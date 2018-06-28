@@ -18,9 +18,13 @@ public class PlayerRespawner : MonoBehaviour
 
     public GameObject[] allRespawnPoints;
 
+    public AudioClip respawnSound;
+    AudioSource audioSource;
+
     private void Start()
     {
         allRespawnPoints = GameObject.FindGameObjectsWithTag("RespawnPoint");
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -34,6 +38,8 @@ public class PlayerRespawner : MonoBehaviour
                 player1.SetActive(true);
                 player1respawnTimer = 0.0f;
                 player1.GetComponent<Platformer2DUserControl>().RespawnPlayer();
+                audioSource.Stop();
+                audioSource.PlayOneShot(respawnSound);
             }
         }
 
@@ -46,6 +52,8 @@ public class PlayerRespawner : MonoBehaviour
                 player2.SetActive(true);
                 player2respawnTimer = 0.0f;
                 player2.GetComponent<Platformer2DUserControl>().RespawnPlayer();
+                audioSource.Stop();
+                audioSource.PlayOneShot(respawnSound);
             }
         }
 
@@ -58,6 +66,8 @@ public class PlayerRespawner : MonoBehaviour
                 player3.SetActive(true);
                 player3respawnTimer = 0.0f;
                 player3.GetComponent<Platformer2DUserControl>().RespawnPlayer();
+                audioSource.Stop();
+                audioSource.PlayOneShot(respawnSound);
             }
         }
 
@@ -70,6 +80,8 @@ public class PlayerRespawner : MonoBehaviour
                 player4.SetActive(true);
                 player4respawnTimer = 0.0f;
                 player4.GetComponent<Platformer2DUserControl>().RespawnPlayer();
+                audioSource.Stop();
+                audioSource.PlayOneShot(respawnSound);
             }
         }
     }

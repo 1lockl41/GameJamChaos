@@ -4,6 +4,7 @@ using UnityEngine;
 
 using UnityStandardAssets._2D;
 using UnityStandardAssets.CrossPlatformInput;
+using XInputDotNetPure;
 
 public class GameController : MonoBehaviour {
 
@@ -26,17 +27,108 @@ public class GameController : MonoBehaviour {
 
     public UI_Voting voter;
 
+    float rumbleTimer = 0.0f;
+    float rumbleDuration = 1.5f;
+    bool isRumble = false;
+
+    bool buffCountdownOn = false;
+    bool finalSoundPlaying = false;
+
+    public AudioClip chargeSound;
+    public AudioClip finishedSound;
+    AudioSource source;
+
+    public AudioSource backgroundMusic;
+    float backgroundMusicVol;
+
+    public AudioClip loseBuffSound;
+
     // Use this for initialization
     void Start()
     {
+        source = GetComponent<AudioSource>();
+        backgroundMusicVol = backgroundMusic.volume;
         SelectPlayer();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if(buffCountdownOn)
+        {
+            foreach(GameObject player in allPlayers)
+            {
+                player.GetComponent<Platformer2DUserControl>().canAttack = false;
+            }
+
+            backgroundMusic.volume = 0.0f;
+
+            Time.timeScale = 0.0f;
+            if (!source.isPlaying)
+            {
+                buffCountdownOn = false;
+                Time.timeScale = 1.0f;
+                currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().StartBuff();
+                buffActive = true;
+                source.PlayOneShot(finishedSound);
+                finalSoundPlaying = true;
+
+                foreach (GameObject player in allPlayers)
+                {
+                    player.GetComponent<Platformer2DUserControl>().canAttack = true;
+                }
+            }
+        }
+
+        if(finalSoundPlaying)
+        {
+            backgroundMusic.volume = 0.0f;
+            if (!source.isPlaying)
+            {
+                finalSoundPlaying = false;
+            }
+        }
+        else if(!buffCountdownOn)
+        {
+            backgroundMusic.volume = backgroundMusicVol;
+        }
+
+
+        if(isRumble)
+        {
+            if(allPlayers[0] != currentlySelectedPlayer)
+            {
+                GamePad.SetVibration((PlayerIndex)0, 15.0f, 15.0f);
+            }
+            if (allPlayers[1] != currentlySelectedPlayer)
+            {
+                GamePad.SetVibration((PlayerIndex)1, 15.0f, 15.0f);
+            }
+            if (allPlayers[2] != currentlySelectedPlayer)
+            {
+                GamePad.SetVibration((PlayerIndex)2, 15.0f, 15.0f);
+            }
+            if (allPlayers[3] != currentlySelectedPlayer)
+            {
+                GamePad.SetVibration((PlayerIndex)3, 15.0f, 15.0f);
+            }
+
+            rumbleTimer += Time.deltaTime;
+            if(rumbleTimer > rumbleDuration)
+            {
+                isRumble = false;
+                GamePad.SetVibration((PlayerIndex)0, 0.0f, 0.0f);
+                GamePad.SetVibration((PlayerIndex)1, 0.0f, 0.0f);
+                GamePad.SetVibration((PlayerIndex)2, 0.0f, 0.0f);
+                GamePad.SetVibration((PlayerIndex)3, 0.0f, 0.0f);
+                rumbleTimer = 0.0f;
+            }
+        }
+
+
         if (shouldPickNewPlayer)
         {
+            voter.DisableText();
             powerCharge = 0.0f;
             timeBeforePickingNewPlayerTime += Time.deltaTime;
             if(timeBeforePickingNewPlayerTime > timeBeforePickingNewPlayer)
@@ -54,41 +146,43 @@ public class GameController : MonoBehaviour {
                 if (powerCharge > 100)
                 {
                     powerCharge = 100;
-                    currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().StartBuff();
-                    buffActive = true;
+                    source.PlayOneShot(chargeSound);
                     voter.DisableText();
+                    buffCountdownOn = true;
                 }
 
                 if(currentlySelectedPlayer == allPlayers[0] && (CrossPlatformInputManager.GetButton(bumperPlayer1)))
                 {
-                    currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().StartBuff();
-                    buffActive = true;
                     voter.DisableText();
+                    source.PlayOneShot(chargeSound);
+                    buffCountdownOn = true;
                 }
                 else if (currentlySelectedPlayer == allPlayers[1] && (CrossPlatformInputManager.GetButton(bumperPlayer2)))
                 {
-                    currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().StartBuff();
-                    buffActive = true;
                     voter.DisableText();
+                    source.PlayOneShot(chargeSound);
+                    buffCountdownOn = true;
                 }
                 else if (currentlySelectedPlayer == allPlayers[2] && (CrossPlatformInputManager.GetButton(bumperPlayer3)))
                 {
-                    currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().StartBuff();
-                    buffActive = true;
                     voter.DisableText();
+                    source.PlayOneShot(chargeSound);
+                    buffCountdownOn = true;
                 }
                 else if (currentlySelectedPlayer == allPlayers[3] && (CrossPlatformInputManager.GetButton(bumperPlayer4)))
                 {
-                    currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().StartBuff();
-                    buffActive = true;
                     voter.DisableText();
+                    source.PlayOneShot(chargeSound);
+                    buffCountdownOn = true;
                 }
             }
             else
             {
+                voter.EnableArrows();
                 powerCharge -= Time.deltaTime * powerDrainRate;
                 if(powerCharge < 0)
                 {
+                    source.PlayOneShot(loseBuffSound);
                     buffActive = false;
                     currentlySelectedPlayer.GetComponent<Platformer2DUserControl>().LoseBuff();
                     shouldPickNewPlayer = true;
@@ -98,6 +192,7 @@ public class GameController : MonoBehaviour {
             if(!currentlySelectedPlayer.activeInHierarchy)
             {
                 shouldPickNewPlayer = true;
+                source.PlayOneShot(loseBuffSound);
             }
         }
 		
@@ -111,8 +206,9 @@ public class GameController : MonoBehaviour {
             currentlySelectedPlayer = tempSelection;
             shouldPickNewPlayer = false;
             timeBeforePickingNewPlayerTime = 0.0f;
-            
-            //Rumble everyone but selected player here
+
+            isRumble = true;
+
         }
     }
 

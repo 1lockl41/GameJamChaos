@@ -22,9 +22,13 @@ GameObject:
   - component: {fileID: 114163217552402506}
   - component: {fileID: 114355335954461796}
   - component: {fileID: 114853628712388950}
+  - component: {fileID: 82320903276426260}
+  - component: {fileID: 114498805411219614}
+  - component: {fileID: 114326479178294444}
+  - component: {fileID: 114830512144328896}
   m_Layer: 0
   m_Name: GameController
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42,7 +46,99 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &82320903276426260
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1084069988409138}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!114 &114163217552402506
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1084069988409138}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5a3f3cd28cc8a9449417db9e9c94ceb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Countdown: {fileID: 0}
+--- !u!114 &114326479178294444
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -50,17 +146,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1084069988409138}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5a3f3cd28cc8a9449417db9e9c94ceb, type: 3}
+  m_Script: {fileID: 11500000, guid: 9256bbe75adbd734cb629f30a514a123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Countdown: {fileID: 0}
+  player1: {fileID: 0}
+  player2: {fileID: 0}
+  player3: {fileID: 0}
+  player4: {fileID: 0}
+  p1HpTxt: {fileID: 0}
+  p2HpTxt: {fileID: 0}
+  p3HpTxt: {fileID: 0}
+  p4HpTxt: {fileID: 0}
 --- !u!114 &114355335954461796
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1084069988409138}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c95f5bbfcc521f42addf66dfb0f1de5, type: 3}
   m_Name: 
@@ -69,6 +172,49 @@ MonoBehaviour:
   P2TextScore: {fileID: 0}
   P3TextScore: {fileID: 0}
   P4TextScore: {fileID: 0}
+--- !u!114 &114498805411219614
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1084069988409138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e75c019af9e40124694a718eef44bd6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Timer: 0
+  Min: 0
+  Sec: 0
+  Timer_Text: {fileID: 0}
+--- !u!114 &114830512144328896
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1084069988409138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a9074d03fd764439d64e76c7515703, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allPlayers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  currentlySelectedPlayer: {fileID: 0}
+  shouldPickNewPlayer: 0
+  powerChargeRate: 2
+  powerDrainRate: 4
+  bumperPlayer1: LeftBumperPlayer1
+  bumperPlayer2: LeftBumperPlayer2
+  bumperPlayer3: LeftBumperPlayer3
+  bumperPlayer4: LeftBumperPlayer4
+  voter: {fileID: 0}
+  chargeSound: {fileID: 8300000, guid: 9d473e8a41fa44740b0ef4d8ee9ecd71, type: 3}
+  finishedSound: {fileID: 8300000, guid: f818f75e53ed7f740b9201dd5aa0e110, type: 3}
+  backgroundMusic: {fileID: 0}
 --- !u!114 &114853628712388950
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -84,5 +230,5 @@ MonoBehaviour:
   player2: {fileID: 0}
   player3: {fileID: 0}
   player4: {fileID: 0}
-  respawnTime: 5
+  respawnTime: 3
   allRespawnPoints: []

@@ -61,7 +61,8 @@ public class Platformer2DUserControl : MonoBehaviour
 
     public float currentHealthPercent = 0.0f;
 
-    bool canAttack = true;
+    [HideInInspector]
+    public bool canAttack = true;
     bool canLightAttack = true;
     bool isLightAttacking = false;
     float attackDurationLight = 0.2f;
@@ -90,14 +91,14 @@ public class Platformer2DUserControl : MonoBehaviour
     public bool specialsNeedsToHitGround = false;
     public bool canOnlyUseSpecialInAir = false;
     public bool canOnlyUseSpecialOnGround = false;
-    float specialTimeOnGroundDuration = 0.6f;
+    float specialTimeOnGroundDuration = 0.9f;
     float specialTimeOnGroundTimer = 0.0f;
 
     float lightAttackResetDuration = 0.35f;
     float lightAttackResetTimer = 0.0f;
     float heavyAttackResetDuration = 0.8f;
     float heavyAttackResetTimer = 0.0f;
-    float specialAttackResetDuration = 1.5f;
+       float specialAttackResetDuration = 2.0f;
     float specialAttackResetTimer = 0.0f;
 
     public string horizontalAxisButton;
@@ -117,6 +118,10 @@ public class Platformer2DUserControl : MonoBehaviour
     [HideInInspector]
     public float speedScale = 1.0f;
 
+    public AudioClip chargeSpecialSound;
+    public AudioClip castSpecialSound;
+    AudioSource audioSource;
+
     private void Awake()
     {
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
@@ -128,6 +133,7 @@ public class Platformer2DUserControl : MonoBehaviour
         startScaleX = this.transform.localScale.x;
         startScaleY = this.transform.localScale.y;
 
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -630,6 +636,11 @@ public class Platformer2DUserControl : MonoBehaviour
                     {
                         isSpecialAttacking = true;
                         m_Character.StopMovement();
+                        if (!audioSource.isPlaying)
+                        {
+                            audioSource.Stop();
+                            audioSource.PlayOneShot(chargeSpecialSound);
+                        }
                     }
                 }
             }
@@ -727,6 +738,10 @@ public class Platformer2DUserControl : MonoBehaviour
                         projectileClone.GetComponent<Rigidbody2D>().AddForce(-Vector2.right * 500);
                     }
                     hasFiredProjectile = true;
+                    if(castSpecialSound != null)
+                    {
+                        audioSource.PlayOneShot(castSpecialSound);
+                    }
                 }
             }
             else if(specialsNeedsToHitGround)
@@ -743,7 +758,7 @@ public class Platformer2DUserControl : MonoBehaviour
             {
                 if(canOnlyUseSpecialOnGround)
                 {
-                    m_Character.m_Rigidbody2D.AddForce(new Vector2(0, 800));
+                    m_Character.m_Rigidbody2D.AddForce(new Vector2(0, 15), ForceMode2D.Impulse);
                 }
 
                 attackBoxSpecial.SetActive(true);
