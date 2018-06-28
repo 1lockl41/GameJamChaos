@@ -10,22 +10,8 @@ public class PlayerDamageTrigger : MonoBehaviour
     Vector3 startPos;
 
     public bool isProjectile = false;
-    public float projectileLifeTime = 5.0f;
-    float lifeTime = 0.0f;
 
-    private void Update()
-    {
-        if (isProjectile)
-        {
-            lifeTime += Time.deltaTime;
-            if (lifeTime > projectileLifeTime)
-            {
-                GameObject.Destroy(this.gameObject);
-            }
-        }
-    }
-
-    void OnTriggerStay2D(Collider2D col)
+	void OnTriggerStay2D(Collider2D col)
     {
         if(col.tag == "Player" && !col.isTrigger)
         {
