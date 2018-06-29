@@ -13,6 +13,8 @@ public class PlayerDamageTrigger : MonoBehaviour
     public float projectileLifeTime = 5.0f;
     float lifeTime = 0.0f;
 
+    public GameObject parentObj;
+
     private void Update()
     {
         if (isProjectile)
@@ -40,6 +42,7 @@ public class PlayerDamageTrigger : MonoBehaviour
                 pushPoint = new Vector2(this.transform.position.x, this.transform.position.y);
             }
 
+            col.GetComponent<Platformer2DUserControl>().lastHitBy = parentObj;
             col.GetComponent<Platformer2DUserControl>().TakeDamage(damage, pushPoint, punchUp);
 
             if(isProjectile)

@@ -97,7 +97,7 @@ public class UI_Voting : MonoBehaviour {
     private bool p3votedR, p3votedG, p3votedB, p3votedY;
     private bool p4votedR, p4votedG, p4votedB, p4votedY;
 
-    bool WaitCompleted;
+    bool WaitCompleted, WaitCompleted2, WaitCompleted3, WaitCompleted4;
 
     private void Start()
     {
@@ -223,7 +223,7 @@ public class UI_Voting : MonoBehaviour {
 
         /////////////////////////////////////////////////////////////////////// Player 2 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (WaitCompleted == true && Choice_Blue2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisHorizontal) == 1)
+        else if (WaitCompleted2 == true && Choice_Blue2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisHorizontal) == 1)
         {
             Debug.Log("player 2 right");
 
@@ -250,7 +250,7 @@ public class UI_Voting : MonoBehaviour {
 
             StartCoroutine(VoteWait());
         }
-        else if (WaitCompleted == true && Choice_Yellow2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisHorizontal) == -1)
+        else if (WaitCompleted2 == true && Choice_Yellow2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisHorizontal) == -1)
         {
             Debug.Log("player 2 left");
 
@@ -278,7 +278,7 @@ public class UI_Voting : MonoBehaviour {
 
             StartCoroutine(VoteWait());
         }
-        else if (WaitCompleted == true && Choice_Red2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisVertical) == 1)
+        else if (WaitCompleted2 == true && Choice_Red2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisVertical) == 1)
         {
             Debug.Log("player 2 up");
 
@@ -306,7 +306,7 @@ public class UI_Voting : MonoBehaviour {
             StartCoroutine(VoteWait());
         }
 
-        else if (WaitCompleted == true && Choice_Green2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisVertical) == -1)
+        else if (WaitCompleted2 == true && Choice_Green2 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player2AxisVertical) == -1)
         {
             Debug.Log("player 2 down");
 
@@ -336,7 +336,7 @@ public class UI_Voting : MonoBehaviour {
 
         /////////////////////////////////////////////////////////////////////// Player 3 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (WaitCompleted == true && Choice_Blue3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisHorizontal) == 1)
+        else if (WaitCompleted3 == true && Choice_Blue3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisHorizontal) == 1)
         {
             Debug.Log("player 3 right");
 
@@ -363,7 +363,7 @@ public class UI_Voting : MonoBehaviour {
 
             StartCoroutine(VoteWait());
         }
-        else if (WaitCompleted == true && Choice_Yellow3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisHorizontal) == -1)
+        else if (WaitCompleted3 == true && Choice_Yellow3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisHorizontal) == -1)
         {
             Debug.Log("player 3 left");
 
@@ -391,7 +391,7 @@ public class UI_Voting : MonoBehaviour {
 
             StartCoroutine(VoteWait());
         }
-        else if (WaitCompleted == true && Choice_Red3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisVertical) == 1)
+        else if (WaitCompleted3 == true && Choice_Red3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisVertical) == 1)
         {
             Debug.Log("player 3 up");
 
@@ -419,7 +419,7 @@ public class UI_Voting : MonoBehaviour {
             StartCoroutine(VoteWait());
         }
 
-        else if (WaitCompleted == true && Choice_Green3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisVertical) == -1)
+        else if (WaitCompleted3 == true && Choice_Green3 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player3AxisVertical) == -1)
         {
             Debug.Log("player 3 down");
 
@@ -448,7 +448,7 @@ public class UI_Voting : MonoBehaviour {
         }
         /////////////////////////////////////////////////////////////////////// Player 4 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        else if (WaitCompleted == true && Choice_Blue4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisHorizontal) == 1)
+        else if (WaitCompleted4 == true && Choice_Blue4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisHorizontal) == 1)
         {
             Debug.Log("player 4 right");
 
@@ -475,7 +475,7 @@ public class UI_Voting : MonoBehaviour {
 
             StartCoroutine(VoteWait());
         }
-        else if (WaitCompleted == true && Choice_Yellow4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisHorizontal) == -1)
+        else if (WaitCompleted4 == true && Choice_Yellow4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisHorizontal) == -1)
         {
             Debug.Log("player 4 left");
 
@@ -503,7 +503,7 @@ public class UI_Voting : MonoBehaviour {
 
             StartCoroutine(VoteWait());
         }
-        else if (WaitCompleted == true && Choice_Red4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisVertical) == 1)
+        else if (WaitCompleted4 == true && Choice_Red4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisVertical) == 1)
         {
             Debug.Log("player 4 up");
 
@@ -531,7 +531,7 @@ public class UI_Voting : MonoBehaviour {
             StartCoroutine(VoteWait());
         }
 
-        else if (WaitCompleted == true && Choice_Green4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisVertical) == -1)
+        else if (WaitCompleted4 == true && Choice_Green4 == false && UnityStandardAssets.CrossPlatformInput.CrossPlatformInputManager.GetAxisRaw(player4AxisVertical) == -1)
         {
             Debug.Log("player 4 down");
 
@@ -609,8 +609,14 @@ public class UI_Voting : MonoBehaviour {
     IEnumerator VoteWait()
     {
         WaitCompleted = false;
+        WaitCompleted2 = false;
+        WaitCompleted3 = false;
+        WaitCompleted4 = false;
         yield return new WaitForSeconds(2);
         WaitCompleted = true;
+        WaitCompleted2 = true;
+        WaitCompleted3 = true;
+        WaitCompleted4 = true;
     }
 
     public void DisableText()

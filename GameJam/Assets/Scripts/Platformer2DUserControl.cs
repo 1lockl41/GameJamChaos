@@ -1,12 +1,14 @@
 using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using XInputDotNetPure;
 
 
 [RequireComponent(typeof (PlatformerCharacter2D))]
 public class Platformer2DUserControl : MonoBehaviour
 {
     private PlatformerCharacter2D m_Character;
+    public PlayerIndex playerNumber;
 
     //Jumping variables
     private bool m_Jump;
@@ -122,6 +124,14 @@ public class Platformer2DUserControl : MonoBehaviour
     public AudioClip castSpecialSound;
     AudioSource audioSource;
 
+    public int score = 0;
+
+    Animator animator;
+
+    public GameObject lastHitBy;
+    float lastHitReset = 5.0f;
+    float lastHitTimer = 0.0f;
+
     private void Awake()
     {
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
@@ -134,6 +144,7 @@ public class Platformer2DUserControl : MonoBehaviour
         startScaleY = this.transform.localScale.y;
 
         audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
     }
 
     private void OnEnable()
@@ -233,6 +244,17 @@ public class Platformer2DUserControl : MonoBehaviour
         else if(isSpecialAttacking)
         {
             IsSpecialAttacking();
+        }
+
+
+        if(lastHitBy != null)
+        {
+            lastHitTimer += Time.deltaTime;
+            if(lastHitTimer > lastHitReset)
+            {
+                lastHitBy = null;
+                lastHitTimer = 0.0f;
+            }
         }
     }
 
@@ -660,6 +682,7 @@ public class Platformer2DUserControl : MonoBehaviour
             attackBoxLightBuffed.SetActive(false);
         }
 
+        animator.SetBool("LightPunch", true);
         m_canShield = false;
         m_canMove = false;
         attackTimerLight += Time.deltaTime;
@@ -672,6 +695,7 @@ public class Platformer2DUserControl : MonoBehaviour
             canLightAttack = false;
             m_canMove = true;
             m_canShield = true;
+            animator.SetBool("LightPunch", false);
         }
     }
 
@@ -688,6 +712,7 @@ public class Platformer2DUserControl : MonoBehaviour
             attackBoxHeavyBuffed.SetActive(false);
         }
 
+        animator.SetBool("HeavyPunch", true);
         m_canShield = false;
         m_canMove = false;
         attackTimerHeavy += Time.deltaTime;
@@ -700,6 +725,7 @@ public class Platformer2DUserControl : MonoBehaviour
             m_canMove = true;
             m_canShield = true;
             attackTimerHeavy = 0.0f;
+            animator.SetBool("HeavyPunch", false);
         }
     }
 
@@ -718,6 +744,8 @@ public class Platformer2DUserControl : MonoBehaviour
             m_Character.StopMovement();
         }
 
+
+        //animator.SetBool("SpecialAttack", true);
         //Wait for charge before attacking
         if (attackTimerSpecial > specialChargeDuration)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -98,19 +99,19 @@ public class GameController : MonoBehaviour {
         {
             if(allPlayers[0] != currentlySelectedPlayer)
             {
-                GamePad.SetVibration((PlayerIndex)0, 15.0f, 15.0f);
+                GamePad.SetVibration(allPlayers[0].GetComponent<Platformer2DUserControl>().playerNumber, 15.0f, 15.0f);
             }
             if (allPlayers[1] != currentlySelectedPlayer)
             {
-                GamePad.SetVibration((PlayerIndex)1, 15.0f, 15.0f);
+                GamePad.SetVibration(allPlayers[1].GetComponent<Platformer2DUserControl>().playerNumber, 15.0f, 15.0f);
             }
             if (allPlayers[2] != currentlySelectedPlayer)
             {
-                GamePad.SetVibration((PlayerIndex)2, 15.0f, 15.0f);
+                GamePad.SetVibration(allPlayers[2].GetComponent<Platformer2DUserControl>().playerNumber, 15.0f, 15.0f);
             }
             if (allPlayers[3] != currentlySelectedPlayer)
             {
-                GamePad.SetVibration((PlayerIndex)3, 15.0f, 15.0f);
+                GamePad.SetVibration(allPlayers[3].GetComponent<Platformer2DUserControl>().playerNumber, 15.0f, 15.0f);
             }
 
             rumbleTimer += Time.deltaTime;
@@ -133,8 +134,12 @@ public class GameController : MonoBehaviour {
             timeBeforePickingNewPlayerTime += Time.deltaTime;
             if(timeBeforePickingNewPlayerTime > timeBeforePickingNewPlayer)
             {
-                SelectPlayer();
-                voter.EnableArrows();
+                if (SelectPlayer())
+                {
+                    shouldPickNewPlayer = false;
+                    buffActive = false;
+                    voter.EnableArrows();
+                }
             }
         }
 
@@ -198,18 +203,19 @@ public class GameController : MonoBehaviour {
 		
 	}
 
-    void SelectPlayer()
+    bool SelectPlayer()
     {
         GameObject tempSelection = allPlayers[Random.Range(0, allPlayers.Length)];
-        if(tempSelection != currentlySelectedPlayer || currentlySelectedPlayer == null)
+        if((tempSelection != currentlySelectedPlayer || currentlySelectedPlayer == null) && tempSelection.activeInHierarchy)
         {
             currentlySelectedPlayer = tempSelection;
             shouldPickNewPlayer = false;
             timeBeforePickingNewPlayerTime = 0.0f;
 
             isRumble = true;
-
+            return true;
         }
+        return false;
     }
 
 }

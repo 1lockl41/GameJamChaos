@@ -9,9 +9,23 @@ public class UI_Timer : MonoBehaviour {
     public float Min;
     public float Sec;
     public Text Timer_Text;
-	// Use this for initialization
-	void Start ()
+
+    public Text Player1txt;
+    public Text Player2txt;
+    public Text Player3txt;
+    public Text Player4txt;
+
+    public Platformer2DUserControl Player1;
+    public Platformer2DUserControl Player2;
+    public Platformer2DUserControl Player3;
+    public Platformer2DUserControl Player4;
+
+    public GameObject endScreen;
+
+    // Use this for initialization
+    void Start ()
     {
+        endScreen.SetActive(false);
 
         Timer = 180f;
     }
@@ -29,6 +43,16 @@ public class UI_Timer : MonoBehaviour {
 
         if(Timer <= 0)
         {
+            Timer = 0;
+            Sec = 0;
+            Min = 0;
+            endScreen.SetActive(true);
+
+            Player1txt.text = Player1.score.ToString();
+            Player2txt.text = Player2.score.ToString();
+            Player3txt.text = Player3.score.ToString();
+            Player4txt.text = Player4.score.ToString();
+
             //run the end game stuff here
             Debug.Log("EndGame");
         }

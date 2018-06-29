@@ -18,7 +18,7 @@ public class PoweUpSpawn : MonoBehaviour {
 
         PowerUpPoints = GameObject.FindGameObjectsWithTag("PowerUpPoint");
 
-        InvokeRepeating("RunPowerups", 15.0f, 10.0f);
+        InvokeRepeating("RunPowerups", 15.0f, 15.0f);
 
     }
 
