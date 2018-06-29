@@ -26,6 +26,12 @@ public class UI_Timer : MonoBehaviour {
         //Sec = Mathf.RoundToInt(Timer % 60f);
     
     Timer_Text.text = Min + ":" + Sec;
+
+        if(Timer <= 0)
+        {
+            //run the end game stuff here
+            Debug.Log("EndGame");
+        }
 	}
 
     void UpdateTimer(float TotalSeconds)

@@ -701,7 +701,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 12.970526
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1265,7 +1265,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
+  m_ScaleFactor: 0.76
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
@@ -2430,11 +2430,11 @@ Prefab:
         type: 3}
     - target: {fileID: 4617648595176202, guid: 4fc196ad31791284e91a6894f34bc36a, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.3
+      value: 0.4499918
       objectReference: {fileID: 0}
     - target: {fileID: 4617648595176202, guid: 4fc196ad31791284e91a6894f34bc36a, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.3
+      value: 0.4499918
       objectReference: {fileID: 0}
     - target: {fileID: 4617648595176202, guid: 4fc196ad31791284e91a6894f34bc36a, type: 2}
       propertyPath: m_LocalScale.z
@@ -2506,6 +2506,10 @@ Prefab:
         type: 2}
       propertyPath: m_Size.x
       value: 0.7069864
+      objectReference: {fileID: 0}
+    - target: {fileID: 4617648595176202, guid: 4fc196ad31791284e91a6894f34bc36a, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: -0.02
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 4fc196ad31791284e91a6894f34bc36a, type: 2}
@@ -2939,7 +2943,7 @@ Prefab:
         type: 2}
       propertyPath: player2
       value: 
-      objectReference: {fileID: 1792755762}
+      objectReference: {fileID: 1077167064}
     - target: {fileID: 114326479178294444, guid: 44492427d19b725489c35fb3a17f5d98,
         type: 2}
       propertyPath: player3
@@ -2949,7 +2953,7 @@ Prefab:
         type: 2}
       propertyPath: player4
       value: 
-      objectReference: {fileID: 1077167064}
+      objectReference: {fileID: 1792755762}
     - target: {fileID: 114326479178294444, guid: 44492427d19b725489c35fb3a17f5d98,
         type: 2}
       propertyPath: p1HpTxt
@@ -3700,11 +3704,11 @@ Prefab:
         type: 3}
     - target: {fileID: 4930600298352312, guid: 53aeac0d91612054cb6811abdf9d7d42, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.3
+      value: 0.4499918
       objectReference: {fileID: 0}
     - target: {fileID: 4930600298352312, guid: 53aeac0d91612054cb6811abdf9d7d42, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.3
+      value: 0.4499918
       objectReference: {fileID: 0}
     - target: {fileID: 4930600298352312, guid: 53aeac0d91612054cb6811abdf9d7d42, type: 2}
       propertyPath: m_LocalScale.z
@@ -3899,11 +3903,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4243306859169418, guid: e05256022fd915841b526e9bffe7d6b7, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.3
+      value: 0.4499918
       objectReference: {fileID: 0}
     - target: {fileID: 4243306859169418, guid: e05256022fd915841b526e9bffe7d6b7, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.3
+      value: 0.4499918
       objectReference: {fileID: 0}
     - target: {fileID: 4243306859169418, guid: e05256022fd915841b526e9bffe7d6b7, type: 2}
       propertyPath: m_LocalScale.z
@@ -3994,6 +3998,10 @@ Prefab:
         type: 2}
       propertyPath: m_Size.x
       value: 0.6604259
+      objectReference: {fileID: 0}
+    - target: {fileID: 1855060196432896, guid: e05256022fd915841b526e9bffe7d6b7, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e05256022fd915841b526e9bffe7d6b7, type: 2}
@@ -4782,7 +4790,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1897513623}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.68, y: 9.12, z: 0}
+  m_LocalPosition: {x: 5.23, y: 9.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1792371504}
